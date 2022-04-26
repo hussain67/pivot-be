@@ -4,11 +4,11 @@ const app = require("./app");
 const connectDB = require("./db/connect");
 const options = {
   cors: true,
-  origins: [process.env.TEACHER_URL, process.env.STUDENT_URL],
+  origins: [process.env.TEACHER_URL, process.env.STUDENT_URL]
 };
 
 connectDB().then(() => {
-  app.server.listen(PORT, (err) => {
+  app.server.listen(PORT, err => {
     if (err) throw err;
     console.log(`Server listening on port ${PORT} ....`);
   });

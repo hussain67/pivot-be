@@ -1,4 +1,4 @@
-const endpoints = require("../endpoints.json");
+const endpoints = require("../../endpoints.json");
 
 const apiInfo = async (req, res, next) => {
   try {
