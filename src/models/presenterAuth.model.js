@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
-const PresenterSchema = mongoose.Schema({
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const presenterSchema = mongoose.Schema({
   name: {
     type: String,
     trim: true,
@@ -21,5 +23,20 @@ const PresenterSchema = mongoose.Schema({
     minLength: [6, "Password must be atleast 6 character long"]
   }
 });
-const Presenter = mongoose.model("User", PresenterSchema);
+presenterSchema.pre("save", async function () {
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+
+presenterSchema.methods.createJWT = function () {
+  const token = jwt.sign({ userId: this._id, name: this.name }, process.env.JWT_SECRET, { expiresIn: "30d" });
+  return token;
+};
+
+presenterSchema.methods.comparePassword = async function (candidatePassword) {
+  const isMatch = await bcrypt.compare(candidatePassword, this.password);
+  return isMatch;
+};
+
+const Presenter = mongoose.model("Presenter", presenterSchema);
 module.exports = Presenter;
