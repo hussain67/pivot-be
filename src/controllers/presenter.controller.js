@@ -1,4 +1,4 @@
-const Presenter = require("../models/presenterAuth.model");
+const Presenter = require("../models/presenter.model");
 
 const register = async (req, res) => {
   //console.log(req.body);
@@ -34,4 +34,8 @@ const logIn = async (req, res) => {
   }
 };
 
-module.exports = { register, logIn };
+const findPresenter = async (req, res) => {
+  res.status(200).send(req.presenter);
+};
+
+module.exports = { register, logIn, findPresenter };

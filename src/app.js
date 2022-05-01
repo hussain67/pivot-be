@@ -13,7 +13,7 @@ const options = {
 io = require("socket.io")(app.server, options);
 const home = require("./routes/home");
 const apiRouter = require("./routes/apiInfo");
-const presenterAuthRouter = require("./routes/presenterAuth.router");
+const presenterRouter = require("./routes/presenter.router");
 //const presentations = require("./routes/presentations");
 
 const { handleInvalidUrlErrors, handleCustomErrors, handleServerErrors } = require("./error-handler/error");
@@ -22,7 +22,7 @@ app.use(express.json());
 
 app.use("/", home);
 app.use("/public", express.static("public"));
-app.use("/api/presenter", presenterAuthRouter);
+app.use("/api/presenter", presenterRouter);
 app.use("/api", apiRouter);
 //app.use("/api/presentations", presentations);
 

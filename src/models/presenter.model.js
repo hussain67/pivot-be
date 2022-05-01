@@ -21,7 +21,15 @@ const presenterSchema = mongoose.Schema({
     trim: true,
     required: [true, "Please provide password"],
     minLength: [6, "Password must be atleast 6 character long"]
-  }
+  },
+  tokens: [
+    {
+      token: {
+        type: String,
+        required: true
+      }
+    }
+  ]
 });
 presenterSchema.pre("save", async function () {
   const salt = await bcrypt.genSalt(10);
@@ -29,7 +37,7 @@ presenterSchema.pre("save", async function () {
 });
 
 presenterSchema.methods.createJWT = function () {
-  const token = jwt.sign({ userId: this._id, name: this.name }, process.env.JWT_SECRET, { expiresIn: "30d" });
+  const token = jwt.sign({ _id: this._id.toString() }, process.env.JWT_SECRET, { expiresIn: "30d" });
   return token;
 };
 
