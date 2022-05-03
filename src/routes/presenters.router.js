@@ -2,10 +2,11 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/authentication");
 
-const { logIn, register, findPresenter } = require("../controllers/presenter.controller");
+const { login, logout, register, findPresenter } = require("../controllers/presenters.controller");
 
 router.post("/register", register);
-router.post("/login", logIn);
+router.post("/login", login);
+router.post("/logout", auth, logout);
 router.get("/getPresenter", auth, findPresenter);
 
 module.exports = router;

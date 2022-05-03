@@ -1,12 +1,11 @@
-const Presenter = require("../models/presenter.model");
+const { findOne } = require("../models/presenters.model");
+const Presenter = require("../models/presenters.model");
 
 const register = async (req, res) => {
-  //console.log(req.body);
   const presenter = new Presenter(req.body);
 
   try {
     await presenter.save().then(presenter => {
-      //console.log(user);
       res.status(201).send(presenter);
     });
   } catch (e) {
@@ -14,7 +13,7 @@ const register = async (req, res) => {
   }
 };
 
-const logIn = async (req, res) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
   let presenter = await Presenter.findOne({ email });
   try {
@@ -34,8 +33,25 @@ const logIn = async (req, res) => {
   }
 };
 
-const findPresenter = async (req, res) => {
-  res.status(200).send(req.presenter);
+const logout = async (req, res) => {
+  const newTokens = req.presenter.tokens.filter(el => {
+    return el.token !== req.token;
+  });
+  req.presenter.tokens = newTokens;
+  try {
+    await req.presenter.save();
+    res.status(200).send();
+  } catch (e) {
+    res.status(500).send();
+  }
 };
 
-module.exports = { register, logIn, findPresenter };
+const findPresenter = async (req, res) => {
+  try {
+    res.status(200).send(req.presenter);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+module.exports = { register, login, logout, findPresenter };
