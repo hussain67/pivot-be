@@ -14,7 +14,6 @@ io = require("socket.io")(app.server, options);
 const home = require("./routes/home");
 const apiRouter = require("./routes/apiInfo");
 const presentersRouter = require("./routes/presenters.router");
-//const presentations = require("./routes/presentations");
 
 const { handleInvalidUrlErrors, handleCustomErrors, handleServerErrors } = require("./error-handler/error");
 
@@ -24,7 +23,6 @@ app.use("/", home);
 app.use("/public", express.static("public"));
 app.use("/api/presenters", presentersRouter);
 app.use("/api", apiRouter);
-//app.use("/api/presentations", presentations);
 
 app.all("*", handleInvalidUrlErrors);
 app.use(handleCustomErrors);

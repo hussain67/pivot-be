@@ -31,13 +31,34 @@ const presenterSchema = mongoose.Schema({
     }
   ]
 });
+presenterSchema.statics.findByCredentials = async (email, password) => {
+  const presenter = await Presenter.findOne({ email });
+  if (!presenter) {
+    throw new Error("Unable to login");
+  }
+  const isMatch = await bcrypt.compare(password, presenter.password);
+  if (!isMatch) {
+    throw new Error("Unable to login");
+  }
+  return presenter;
+};
+
 presenterSchema.pre("save", async function () {
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-presenterSchema.methods.createJWT = function () {
+presenterSchema.methods.toJSON = function () {
+  const presenterObject = this.toObject();
+  delete presenterObject.password;
+  delete presenterObject.tokens;
+  return presenterObject;
+};
+
+presenterSchema.methods.createJWT = async function () {
   const token = jwt.sign({ id: this._id.toString() }, process.env.JWT_SECRET, { expiresIn: "30d" });
+  this.tokens = this.tokens.concat({ token });
+  await this.save();
   return token;
 };
 

@@ -5,31 +5,23 @@ const register = async (req, res) => {
   const presenter = new Presenter(req.body);
 
   try {
-    await presenter.save().then(presenter => {
-      res.status(201).send(presenter);
-    });
+    await presenter.save();
+    const token = await presenter.createJWT();
+    res.status(201).send({ presenter, token });
   } catch (e) {
-    console.log(e);
+    res.status(400).send(e);
   }
 };
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  let presenter = await Presenter.findOne({ email });
   try {
-    if (!presenter) {
-      res.status(401).send({ msg: "No user exists for this email" });
-    }
-    const isPasswordCorrect = await presenter.comparePassword(password);
-    if (isPasswordCorrect) {
-      const token = presenter.createJWT();
-      res.status(200).json({ presenter: { name: presenter.name }, token });
-    }
-    if (!isPasswordCorrect) {
-      res.status(401).send("Please use correct password");
-    }
+    const presenter = await Presenter.findByCredentials(email, password);
+    // console.log(presenter);
+    const token = await presenter.createJWT();
+    res.status(200).send({ presenter, token });
   } catch (e) {
-    console.log(e);
+    res.status(400).send();
   }
 };
 
@@ -50,8 +42,36 @@ const findPresenter = async (req, res) => {
   try {
     res.status(200).send(req.presenter);
   } catch (e) {
-    console.log(e);
+    res.status(401).send(e);
   }
 };
 
-module.exports = { register, login, logout, findPresenter };
+const deletePresenter = async (req, res) => {
+  try {
+    await req.presenter.delete();
+    res.send(req.presenter);
+  } catch (e) {
+    res.status(500).send();
+  }
+};
+
+const updatePresenter = async (req, res) => {
+  const updates = Object.keys(req.body);
+  const allowableUpdates = ["name", "email", "password"];
+  const isValidOperation = updates.every(update => allowableUpdates.includes(update));
+  if (!isValidOperation) {
+    return res.status(400).send({ error: "Invalid updates!" });
+  }
+  try {
+    updates.forEach(update => {
+      req.presenter[update] = req.body[update];
+    });
+
+    await req.presenter.save();
+    res.status(200).send(req.presenter);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+};
+
+module.exports = { register, login, logout, findPresenter, deletePresenter, updatePresenter };
