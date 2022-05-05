@@ -93,11 +93,22 @@ describe("Delete a presenter", () => {
   });
   test(" Should not delete an authenticated presenter", async () => {
     await request(app).delete("/api/presenters/me").send({}).expect(401);
+    const presenter = await Presenter.findById(presenterOneId);
+    expect(presenter).toMatchObject({
+      _id: presenterOneId,
+      name: "msh",
+      email: "msh@example.com"
+    });
   });
 });
 
 describe("Update an presenter", () => {
   test("Update an authenticated presenter field", async () => {
-    await request(app).patch("/api/presenters/me").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({ name: "msh123" }).expect(200);
+    const response = await request(app).patch("/api/presenters/me").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({ name: "msh123" }).expect(200);
+    expect(response.body.name).toBe("msh123");
+  });
+  test.only("Should not update an invalid presenter field", async () => {
+    const response = await request(app).patch("/api/presenters/me").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({ profession: "teacher" }).expect(400);
+    console.log(response.body);
   });
 });
