@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+/*
 const ResponseSchema = new mongoose.Schema({
   username: String,
   answer: { type: String, enum: ["A", "B", "C", "D", "E", "F"] },
@@ -23,5 +24,26 @@ const PresentationSchema = new mongoose.Schema({
   sessionId: String,
   slides: [SlideSchema],
 });
+*/
 
-module.exports = mongoose.model("Presentation", PresentationSchema);
+const SlideSchema = new mongoose.Schema({
+  slideTitle: { type: String, required: true }
+  //slideImageUrl: { type: String, required: true },
+
+  //slideId: { type: String, required: true },
+  //question: QuestionSchema,
+});
+
+const PresentationSchema = new mongoose.Schema({
+  title: { type: String, required: true }
+  /*
+  createdBy: {
+    type: mongoose.Types.ObjectId,
+    ref: "Presenter",
+    required: [true, "Please provide presenter"]
+  }*/
+  //slides: [SlideSchema]
+});
+
+const Presentation = mongoose.model("Presentation", PresentationSchema);
+module.exports = Presentation;

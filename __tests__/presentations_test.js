@@ -1,5 +1,25 @@
-test("", () => {
-  //console.log("Ok");
+const request = require("supertest");
+const app = require("../src/app");
+const connectDB = require("../src/db/connect");
+const Presentation = require("../src/models/presentations.model");
+const { presenterOne, setupDatabase } = require("../src/db/seed-test");
+connectDB();
+jest.setTimeout(10000);
+
+beforeEach(setupDatabase);
+
+test("Get welcome message", async () => {
+  const response = await request(app).get("/api/presentations").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).expect(200);
+  //console.log(response.body);
+});
+
+describe("Create a presentation", () => {
+  test("Create a presentation", async () => {
+    const presenter = await request(app).post("/api/presentations").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({ title: "Creation of universe-2 " }).expect(201);
+    // console.log(presenter.body);
+
+    //console.log(response.body);
+  });
 });
 /*
 const app = require("../app");

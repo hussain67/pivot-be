@@ -1,31 +1,19 @@
-const mongoose = require("mongoose");
 const request = require("supertest");
-const jwt = require("jsonwebtoken");
 const app = require("../src/app");
 const connectDB = require("../src/db/connect");
 const Presenter = require("../src/models/presenters.model");
+const { presenterOneId, presenterOne, setupDatabase } = require("../src/db/seed-test");
 connectDB();
 jest.setTimeout(10000);
 
-const presenterOneId = new mongoose.Types.ObjectId();
-const presenterOne = {
-  _id: presenterOneId,
-  name: "msh",
-  email: "msh@example.com",
-  password: "msh12345",
-  tokens: [{ token: jwt.sign({ id: presenterOneId.toString() }, process.env.JWT_SECRET) }]
-};
-
-beforeEach(async () => {
-  await Presenter.deleteMany();
-  await new Presenter(presenterOne).save();
-});
+beforeEach(setupDatabase);
 
 describe("Create new presenter", () => {
   test("return status 201 and register a new prasenter", async () => {
     const response = await request(app).post("/api/presenters/register").send({ name: "shahid", email: "shahid@shahid.com", password: "shahid12345" }).expect(201);
     const presenter = await Presenter.findById(response.body.presenter._id);
     expect(presenter).not.toBeNull();
+    //console.log(response.body);
     expect(response.body).toMatchObject({
       presenter: {
         name: "shahid",
@@ -96,8 +84,8 @@ describe("Delete a presenter", () => {
     const presenter = await Presenter.findById(presenterOneId);
     expect(presenter).toMatchObject({
       _id: presenterOneId,
-      name: "msh",
-      email: "msh@example.com"
+      name: "msh1",
+      email: "msh1@example.com"
     });
   });
 });
@@ -107,8 +95,7 @@ describe("Update an presenter", () => {
     const response = await request(app).patch("/api/presenters/me").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({ name: "msh123" }).expect(200);
     expect(response.body.name).toBe("msh123");
   });
-  test.only("Should not update an invalid presenter field", async () => {
+  test("Should not update an invalid presenter field", async () => {
     const response = await request(app).patch("/api/presenters/me").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({ profession: "teacher" }).expect(400);
-    console.log(response.body);
   });
 });

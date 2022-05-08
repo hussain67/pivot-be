@@ -56,8 +56,14 @@ presenterSchema.methods.toJSON = function () {
 };
 
 presenterSchema.methods.createJWT = async function () {
-  const token = jwt.sign({ id: this._id.toString() }, process.env.JWT_SECRET, { expiresIn: "30d" });
+  const token = jwt.sign(
+    { id: this._id.toString() },
+
+    process.env.JWT_SECRET,
+    { expiresIn: "30d" }
+  );
   this.tokens = this.tokens.concat({ token });
+  //console.log(this.tokens);
   await this.save();
   return token;
 };

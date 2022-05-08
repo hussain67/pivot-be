@@ -5,7 +5,7 @@
   "main": "y",
   "scripts": {
     "dev": "env-cmd -f ./config/dev.env nodemon listen.js",
-    "test": "env-cmd -f ./config/test.env jest --watch",
+    "test": "env-cmd -f ./config/test.env jest --watch --runInBand",
     "start": "node listen.js"
   },
   "repository": {
