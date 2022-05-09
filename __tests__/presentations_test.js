@@ -33,7 +33,6 @@ describe("Get presentation by id", () => {
   });
 });
 
-/*
 describe("Get presentations by a prasenter", () => {
   test("Should fetch all the presentations by a presenter", async () => {
     const presentations = await request(app).get(`/api/presentations/`).set("Authorization", `Bearer ${presenterTwo.tokens[0].token}`).send().expect(200);
@@ -41,7 +40,6 @@ describe("Get presentations by a prasenter", () => {
     expect(presentations.body.length).toBe(2);
   });
 });
-*/
 
 /*
 
