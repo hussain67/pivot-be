@@ -9,7 +9,7 @@ const presenterOne = {
   name: "msh1",
   email: "msh1@example.com",
   password: "msh123451",
-  tokens: [{ token: jwt.sign({ id: presenterOneId.toString() }, process.env.JWT_SECRET) }]
+  tokens: [{ token: jwt.sign({ _id: presenterOneId }, process.env.JWT_SECRET) }]
 };
 const presenterTwoId = new mongoose.Types.ObjectId();
 const presenterTwo = {
@@ -17,22 +17,22 @@ const presenterTwo = {
   name: "msh2",
   email: "msh2@example.com",
   password: "msh223451",
-  tokens: [{ token: jwt.sign({ id: presenterTwoId.toString() }, process.env.JWT_SECRET) }]
+  tokens: [{ token: jwt.sign({ _id: presenterTwoId }, process.env.JWT_SECRET) }]
 };
 const presentationOne = {
   _id: new mongoose.Types.ObjectId(),
   title: "Chemical reaction 1",
-  createdBy: presenterOneId
+  createdBy: presenterOne._id
 };
 const presentationTwo = {
   _id: new mongoose.Types.ObjectId(),
   title: "Chemical reaction 2",
-  createdBy: presenterTwoId
+  createdBy: presenterTwo._id
 };
 const presentationThree = {
   _id: new mongoose.Types.ObjectId(),
   title: "Chemical reaction 3",
-  createdBy: presenterTwoId
+  createdBy: presenterTwo._id
 };
 const setupDatabase = async () => {
   await Presenter.deleteMany();

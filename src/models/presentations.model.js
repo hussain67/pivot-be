@@ -38,7 +38,7 @@ const PresentationSchema = new mongoose.Schema({
   title: { type: String, required: true },
 
   createdBy: {
-    type: mongoose.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Presenter",
     required: [true, "Please provide presenter"]
   }

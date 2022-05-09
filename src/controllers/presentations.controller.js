@@ -36,4 +36,13 @@ const getPresentations = async (req, res) => {
   }
 };
 
-module.exports = { postPresentation, getPresentationById, getPresentationWelcomeMessage, getPresentations };
+const deletePresentationById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await Presentation.deleteOne({ _id: id, createdBy: req.presenter._id });
+    res.status(200).send();
+  } catch (e) {
+    res.status(404).send(e);
+  }
+};
+module.exports = { postPresentation, getPresentationById, getPresentationWelcomeMessage, getPresentations, deletePresentationById };

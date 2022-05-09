@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const Presentation = require("./presentations.model");
 const presenterSchema = mongoose.Schema({
   name: {
     type: String,
@@ -50,11 +51,6 @@ presenterSchema.statics.findByCredentials = async (email, password) => {
   return presenter;
 };
 
-presenterSchema.pre("save", async function () {
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-});
-
 presenterSchema.methods.toJSON = function () {
   const presenterObject = this.toObject();
   delete presenterObject.password;
@@ -64,7 +60,7 @@ presenterSchema.methods.toJSON = function () {
 
 presenterSchema.methods.createJWT = async function () {
   const token = jwt.sign(
-    { id: this._id.toString() },
+    { _id: this._id.toString() },
 
     process.env.JWT_SECRET,
     { expiresIn: "30d" }
@@ -79,6 +75,14 @@ presenterSchema.methods.comparePassword = async function (candidatePassword) {
   const isMatch = await bcrypt.compare(candidatePassword, this.password);
   return isMatch;
 };
+presenterSchema.pre("save", async function () {
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
 
+presenterSchema.pre("delete", async function (next) {
+  await Presentation.deleteMany({ createdBy: this._id });
+  next();
+});
 const Presenter = mongoose.model("Presenter", presenterSchema);
 module.exports = Presenter;

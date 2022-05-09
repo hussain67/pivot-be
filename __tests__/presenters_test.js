@@ -69,7 +69,7 @@ describe("Authentication presenter", () => {
     await request(app).get("/api/presenters/me").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({}).expect(200);
   });
   test("Should not return non existing presenter", async () => {
-    await request(app).get("/api/presenters/me").set("Authorization", `Bearer 12352vbshxsh`).send({}).expect(401);
+    await request(app).get("/api/presenters/me").set("Authorization", `Bearer 12352vbshxsh`).send().expect(401);
   });
 });
 

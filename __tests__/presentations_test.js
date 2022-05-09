@@ -7,7 +7,6 @@ connectDB();
 jest.setTimeout(10000);
 
 beforeEach(setupDatabase);
-
 test("Get welcome message", async () => {
   const response = await request(app).get("/api/presentations/welcome").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).expect(200);
 });
@@ -38,6 +37,12 @@ describe("Get presentations by a prasenter", () => {
     const presentations = await request(app).get(`/api/presentations/`).set("Authorization", `Bearer ${presenterTwo.tokens[0].token}`).send().expect(200);
     //console.log(presentations.body.length);
     expect(presentations.body.length).toBe(2);
+  });
+});
+
+describe("Delete presentation", () => {
+  test("Should delete a presentation of an authenticated user", async () => {
+    await request(app).delete(`/api/presentations/${presentationTwo._id}`).set("Authorization", `Bearer ${presenterTwo.tokens[0].token}`).send().expect(200);
   });
 });
 
