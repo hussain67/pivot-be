@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { postPresentation, getPresentation } = require("../controllers/presentations.controller");
+const { postPresentation, getPresentationWelcomeMessage, getPresentationById } = require("../controllers/presentations.controller");
 
 router.post("/", postPresentation);
-router.get("/", getPresentation);
+router.get("/welcome", getPresentationWelcomeMessage);
+//router.get("/", getPresentations);
+router.get("/:id", getPresentationById);
 
 module.exports = router;

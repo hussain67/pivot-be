@@ -29,6 +29,11 @@ const presentationTwo = {
   title: "Chemical reaction 2",
   createdBy: presenterTwoId
 };
+const presentationThree = {
+  _id: new mongoose.Types.ObjectId(),
+  title: "Chemical reaction 3",
+  createdBy: presenterTwoId
+};
 const setupDatabase = async () => {
   await Presenter.deleteMany();
   await Presentation.deleteMany();
@@ -36,6 +41,7 @@ const setupDatabase = async () => {
   await new Presenter(presenterTwo).save();
   await new Presentation(presentationOne).save();
   await new Presentation(presentationTwo).save();
+  await new Presentation(presentationThree).save();
 };
 
 module.exports = {
@@ -43,5 +49,7 @@ module.exports = {
   presenterOne,
   presenterTwo,
   presenterTwoId,
+  presentationOne,
+  presentationTwo,
   setupDatabase
 };

@@ -35,13 +35,13 @@ const SlideSchema = new mongoose.Schema({
 });
 
 const PresentationSchema = new mongoose.Schema({
-  title: { type: String, required: true }
-  /*
+  title: { type: String, required: true },
+
   createdBy: {
     type: mongoose.Types.ObjectId,
     ref: "Presenter",
     required: [true, "Please provide presenter"]
-  }*/
+  }
   //slides: [SlideSchema]
 });
 

@@ -31,6 +31,13 @@ const presenterSchema = mongoose.Schema({
     }
   ]
 });
+
+presenterSchema.virtual("presentations", {
+  ref: "Presentation",
+  localField: "_id",
+  foreignField: "createdBy"
+});
+
 presenterSchema.statics.findByCredentials = async (email, password) => {
   const presenter = await Presenter.findOne({ email });
   if (!presenter) {

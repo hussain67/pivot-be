@@ -9,10 +9,24 @@ const postPresentation = async (req, res) => {
   }
 };
 
-const getPresentation = async (req, res) => {
+const getPresentationWelcomeMessage = async (req, res) => {
   await res.status(200).send({ msg: "Welcome from controller" });
 };
-module.exports = { postPresentation, getPresentation };
+
+const getPresentationById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const presentation = await Presentation.findOne({ _id: id, createdBy: req.presenter._id });
+    if (!presentation) {
+      res.status(404).send();
+    }
+    res.status(200).send(presentation);
+  } catch (e) {
+    res.status(500).send();
+  }
+};
+
+module.exports = { postPresentation, getPresentationById, getPresentationWelcomeMessage };
 /*
 exports.postPresentation = (req, res, next) => {
   const { presentationId, slides } = req.body;
