@@ -39,8 +39,9 @@ const PresentationSchema = new mongoose.Schema({
 
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Presenter",
-    required: [true, "Please provide presenter"]
+
+    required: [true, "Please provide presenter"],
+    ref: "Presenter"
   }
   //slides: [SlideSchema]
 });

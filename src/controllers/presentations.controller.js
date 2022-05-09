@@ -45,4 +45,26 @@ const deletePresentationById = async (req, res) => {
     res.status(404).send(e);
   }
 };
-module.exports = { postPresentation, getPresentationById, getPresentationWelcomeMessage, getPresentations, deletePresentationById };
+const updatePresentationById = async (req, res) => {
+  const updates = Object.keys(req.body);
+  const allowableUpdates = ["title", "createdBy"];
+  const isValidOperation = updates.every(update => {
+    return allowableUpdates.includes(update);
+  });
+  if (!isValidOperation) {
+    return res.status(400).send({ error: "Invalid updates" });
+  }
+  try {
+    const presentation = await Presentation.findOne({ _id: req.params.id, createdBy: req.presenter._id });
+    //console.log(presentation);
+
+    updates.forEach(update => {
+      return (presentation[update] = req.body[update]);
+    });
+    await presentation.save();
+    res.status(200).send(presentation);
+  } catch (e) {
+    res.status(404).send();
+  }
+};
+module.exports = { postPresentation, getPresentationById, getPresentationWelcomeMessage, getPresentations, deletePresentationById, updatePresentationById };

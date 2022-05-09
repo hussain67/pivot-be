@@ -45,10 +45,19 @@ describe("Delete presentation", () => {
     await request(app).delete(`/api/presentations/${presentationTwo._id}`).set("Authorization", `Bearer ${presenterTwo.tokens[0].token}`).send().expect(200);
   });
 });
+describe("Update a presentation", () => {
+  test("Should update a presentation field", async () => {
+    const presentation = await request(app).patch(`/api/presentations/${presentationTwo._id}`).set("Authorization", `Bearer ${presenterTwo.tokens[0].token}`).send({ title: "updated title" }).expect(200);
+    expect(presentation.body.title).toBe("updated title");
+  });
+  test("Should not update a presentation field of another presenter", async () => {
+    await request(app).patch(`/api/presentations/${presentationOne._id}`).set("Authorization", `Bearer ${presenterTwo.tokens[0].token}`).send({ title: "updated title" }).expect(404);
+    const presentation = await Presentation.findById(presentationOne._id);
+    expect(presentation.title).toBe("Chemical reaction 1");
+  });
+});
 
 /*
-
-
 beforeAll(async () => {
   await db();
 });
