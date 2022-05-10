@@ -99,3 +99,9 @@ describe("Update an presenter", () => {
     const response = await request(app).patch("/api/presenters/me").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({ profession: "teacher" }).expect(400);
   });
 });
+describe.only("Error handling for invalid url", () => {
+  test("status:404 and return an error message", async () => {
+    const response = await request(app).get("/invalid_url").expect(404);
+    expect(response.body.msg).toBe("Can't find /invalid_url on this server!");
+  });
+});

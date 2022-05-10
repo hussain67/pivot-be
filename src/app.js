@@ -17,8 +17,9 @@ const presentersRouter = require("./routes/presenters.route");
 const presentationsRouter = require("./routes/presentations.route");
 const auth = require("./middleware/authentication");
 
-const { handleInvalidUrlErrors, handleCustomErrors, handleServerErrors } = require("./error-handler/error");
-
+const invalideUrlMiddleware = require("./middleware/invalid-url");
+const errorHandlerMiddleware = require("./middleware/error-handler");
+//console.log(invalideUrlMiddleware);
 app.use(express.json());
 
 app.use("/", home);
@@ -27,9 +28,9 @@ app.use("/api/presenters", presentersRouter);
 app.use("/api/presentations", auth, presentationsRouter);
 app.use("/api", apiRouter);
 
-app.all("*", handleInvalidUrlErrors);
-app.use(handleCustomErrors);
-app.use(handleServerErrors);
+app.use("*", invalideUrlMiddleware);
+app.use(errorHandlerMiddleware);
+//app.use(handleServerErrors);
 io.on("connection", socket => {
   console.log(`User connected ${socket.id}`);
 
