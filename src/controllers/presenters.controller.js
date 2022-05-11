@@ -1,27 +1,25 @@
-const { findOne } = require("../models/presenters.model");
 const Presenter = require("../models/presenters.model");
-
-const register = async (req, res) => {
+const register = async (req, res, next) => {
   const presenter = new Presenter(req.body);
 
   try {
     await presenter.save();
     const token = await presenter.createJWT();
     res.status(201).send({ presenter, token });
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (error) {
+    next(error);
   }
 };
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
+
   try {
     const presenter = await Presenter.findByCredentials(email, password);
-    // console.log(presenter);
     const token = await presenter.createJWT();
     res.status(200).send({ presenter, token });
-  } catch (e) {
-    res.status(400).send();
+  } catch (error) {
+    next(error);
   }
 };
 

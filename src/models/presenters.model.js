@@ -8,7 +8,7 @@ const presenterSchema = mongoose.Schema({
     trim: true,
     required: [true, "Please provide name"],
     minLength: [2, "Name must be atleast 2 character long"],
-    maxlength: [50, "Name length shoul dnot more than 30 character"]
+    maxlength: [50, "Name length shoul not more than 30 character"]
   },
   email: {
     type: String,
@@ -41,12 +41,14 @@ presenterSchema.virtual("presentations", {
 
 presenterSchema.statics.findByCredentials = async (email, password) => {
   const presenter = await Presenter.findOne({ email });
+
   if (!presenter) {
-    throw new Error("Unable to login");
+    return Promise.reject({ statusCode: 400, message: "Invalid email" });
   }
+
   const isMatch = await bcrypt.compare(password, presenter.password);
   if (!isMatch) {
-    throw new Error("Unable to login");
+    return Promise.reject({ statusCode: 400, message: "Invalid password" });
   }
   return presenter;
 };

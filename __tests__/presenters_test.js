@@ -13,7 +13,6 @@ describe("Create new presenter", () => {
     const response = await request(app).post("/api/presenters/register").send({ name: "shahid", email: "shahid@shahid.com", password: "shahid12345" }).expect(201);
     const presenter = await Presenter.findById(response.body.presenter._id);
     expect(presenter).not.toBeNull();
-    //console.log(response.body);
     expect(response.body).toMatchObject({
       presenter: {
         name: "shahid",
@@ -21,6 +20,11 @@ describe("Create new presenter", () => {
       }
     });
     expect(presenter.password).not.toBe("shahid12345");
+  });
+
+  test("Return status 400 and error message when namehas less than two characer", async () => {
+    const response = await request(app).post("/api/presenters/register").send({ name: "s", email: "shahid@shahid.com", password: "shahid12345" }).expect(400);
+    expect(response.body.msg).toBe("Name must be atleast 2 character long");
   });
 });
 
@@ -39,22 +43,24 @@ describe("Login user", () => {
     expect(response.body.token).toBe(presenter.tokens[1].token);
   });
   test("Should not login non existant user", async () => {
-    await request(app)
+    const response = await request(app)
       .post("/api/presenters/login")
       .send({
         email: "non@non.com",
         password: presenterOne.password
       })
       .expect(400);
+    expect(response.body.msg).toBe("Invalid email");
   });
   test("Should not login with incorrect password", async () => {
-    await request(app)
+    const response = await request(app)
       .post("/api/presenters/login")
       .send({
         email: presenterOne.email,
         password: "njskk1234"
       })
       .expect(400);
+    expect(response.body.msg).toBe("Invalid password");
   });
 });
 
@@ -68,17 +74,18 @@ describe("Authentication presenter", () => {
   test("Should get existing presenter", async () => {
     await request(app).get("/api/presenters/me").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({}).expect(200);
   });
+
   test("Should not return non existing presenter", async () => {
     await request(app).get("/api/presenters/me").set("Authorization", `Bearer 12352vbshxsh`).send().expect(401);
   });
 });
-
 describe("Delete a presenter", () => {
   test("Delete an authenticated presenter", async () => {
     await request(app).delete("/api/presenters/me").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({}).expect(200);
     const presenter = await Presenter.findById(presenterOneId);
     expect(presenter).toBeNull();
   });
+
   test(" Should not delete an authenticated presenter", async () => {
     await request(app).delete("/api/presenters/me").send({}).expect(401);
     const presenter = await Presenter.findById(presenterOneId);
@@ -99,7 +106,7 @@ describe("Update an presenter", () => {
     const response = await request(app).patch("/api/presenters/me").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({ profession: "teacher" }).expect(400);
   });
 });
-describe.only("Error handling for invalid url", () => {
+describe("Error handling for invalid url", () => {
   test("status:404 and return an error message", async () => {
     const response = await request(app).get("/invalid_url").expect(404);
     expect(response.body.msg).toBe("Can't find /invalid_url on this server!");
