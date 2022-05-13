@@ -1,11 +1,14 @@
 const Presenter = require("../models/presenters.model");
+const { StatusCodes } = require("http-status-codes");
+const { UnauthenticatedError, BadRequestError } = require("../errors");
+
 const register = async (req, res, next) => {
   const presenter = new Presenter(req.body);
 
   try {
     await presenter.save();
     const token = await presenter.createJWT();
-    res.status(201).send({ presenter, token });
+    res.status(StatusCodes.CREATED).json({ presenter, token });
   } catch (error) {
     next(error);
   }
@@ -13,17 +16,28 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   const { email, password } = req.body;
-
   try {
-    const presenter = await Presenter.findByCredentials(email, password);
+    if (!email || !password) {
+      throw new BadRequestError("Please provide email and password");
+    }
+
+    const presenter = await Presenter.findOne({ email });
+    if (!presenter) {
+      throw new UnauthenticatedError("Invalid credentials");
+    }
+    const isPasswordCorrect = await presenter.comparePassword(password);
+    if (!isPasswordCorrect) {
+      throw new UnauthenticatedError("Invalid credentials");
+    }
+
     const token = await presenter.createJWT();
-    res.status(200).send({ presenter, token });
+    res.status(StatusCodes.OK).send({ presenter, token });
   } catch (error) {
     next(error);
   }
 };
 
-const logout = async (req, res) => {
+const logout = async (req, res, next) => {
   const newTokens = req.presenter.tokens.filter(el => {
     return el.token !== req.token;
   });
@@ -31,25 +45,25 @@ const logout = async (req, res) => {
   try {
     await req.presenter.save();
     res.status(200).send();
-  } catch (e) {
-    res.status(500).send();
+  } catch (error) {
+    next(error);
   }
 };
 
-const findPresenter = async (req, res) => {
+const findPresenter = async (req, res, next) => {
   try {
     res.status(200).send(req.presenter);
-  } catch (e) {
-    res.status(401).send(e);
+  } catch (error) {
+    next(error);
   }
 };
 
-const deletePresenter = async (req, res) => {
+const deletePresenter = async (req, res, next) => {
   try {
     await req.presenter.delete();
     res.send(req.presenter);
-  } catch (e) {
-    res.status(500).send();
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -67,8 +81,8 @@ const updatePresenter = async (req, res) => {
 
     await req.presenter.save();
     res.status(200).send(req.presenter);
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (error) {
+    next(error);
   }
 };
 

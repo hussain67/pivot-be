@@ -68,8 +68,8 @@ presenterSchema.methods.createJWT = async function () {
     { expiresIn: "30d" }
   );
   this.tokens = this.tokens.concat({ token });
-  //console.log(this.tokens);
   await this.save();
+
   return token;
 };
 

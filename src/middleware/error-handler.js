@@ -3,19 +3,14 @@ const errorHandlerMiddleware = (err, req, res, next) => {
     statusCode: err.statusCode || 500,
     msg: err.message || "Something went wrong, try again latter "
   };
-  //console.log(err);
-  /*
-  if (err instanceof CustomAPIError) {
-    return res.status(err.statusCode).json({ msg: err.message });
-  }
-*/
+  //console.log(err.message);
 
   if (err.name === "ValidationError") {
     customError.msg = Object.values(err.errors)
       .map(item => {
         return item;
       })
-      .join(",");
+      .join(", ");
     customError.statusCode = 400;
   }
   if (err.code && err.code === 11000) {
@@ -23,11 +18,13 @@ const errorHandlerMiddleware = (err, req, res, next) => {
     customError.statusCode = 400;
   }
   if (err.name === "CastError") {
-    customError.msg = ` No item found with id ${err.value}`;
+    customError.msg = `No item found with id ${err.value}`;
     customError.statusCode = 404;
   }
-  //return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ err });
-  //return res.status(customError.statusCode).json({ err });
+  if (err.name === "JsonWebTokenError" && err.message === "jwt malformed") {
+    (customError.statusCode = 401), (customError.msg = "Authentication failed");
+  }
+
   return res.status(customError.statusCode).json({ msg: customError.msg });
 };
 

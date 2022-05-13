@@ -19,6 +19,14 @@ const presenterTwo = {
   password: "msh223451",
   tokens: [{ token: jwt.sign({ _id: presenterTwoId }, process.env.JWT_SECRET) }]
 };
+const presenterThreeId = new mongoose.Types.ObjectId();
+const presenterThree = {
+  _id: presenterThreeId,
+  name: "msh3",
+  email: "msh3@example.com",
+  password: "msh3234513",
+  tokens: [{ token: jwt.sign({ _id: presenterThreeId }, process.env.JWT_SECRET) }]
+};
 const presentationOne = {
   _id: new mongoose.Types.ObjectId(),
   title: "Chemical reaction 1",
@@ -39,6 +47,7 @@ const setupDatabase = async () => {
   await Presentation.deleteMany();
   await new Presenter(presenterOne).save();
   await new Presenter(presenterTwo).save();
+  await new Presenter(presenterThree).save();
   await new Presentation(presentationOne).save();
   await new Presentation(presentationTwo).save();
   await new Presentation(presentationThree).save();
@@ -51,5 +60,7 @@ module.exports = {
   presenterTwoId,
   presentationOne,
   presentationTwo,
+  presenterThree,
+  presenterThreeId,
   setupDatabase
 };

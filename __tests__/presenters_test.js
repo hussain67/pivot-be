@@ -22,7 +22,7 @@ describe("Create new presenter", () => {
     expect(presenter.password).not.toBe("shahid12345");
   });
 
-  test("Return status 400 and error message when namehas less than two characer", async () => {
+  test("Return status 400 and error message when name has less than two characer", async () => {
     const response = await request(app).post("/api/presenters/register").send({ name: "s", email: "shahid@shahid.com", password: "shahid12345" }).expect(400);
     expect(response.body.msg).toBe("Name must be atleast 2 character long");
   });
@@ -40,7 +40,8 @@ describe("Login user", () => {
 
     //Validate new token is saved
     const presenter = await Presenter.findById(presenterOneId);
-    expect(response.body.token).toBe(presenter.tokens[1].token);
+    let expectedToken = presenter.tokens[1].token;
+    expect(response.body.token).toBe(expectedToken);
   });
   test("Should not login non existant user", async () => {
     const response = await request(app)
@@ -49,8 +50,9 @@ describe("Login user", () => {
         email: "non@non.com",
         password: presenterOne.password
       })
-      .expect(400);
-    expect(response.body.msg).toBe("Invalid email");
+      .expect(401);
+
+    expect(response.body.msg).toBe("Invalid credentials");
   });
   test("Should not login with incorrect password", async () => {
     const response = await request(app)
@@ -59,8 +61,8 @@ describe("Login user", () => {
         email: presenterOne.email,
         password: "njskk1234"
       })
-      .expect(400);
-    expect(response.body.msg).toBe("Invalid password");
+      .expect(401);
+    expect(response.body.msg).toBe("Invalid credentials");
   });
 });
 

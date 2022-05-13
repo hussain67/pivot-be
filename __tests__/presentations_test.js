@@ -2,21 +2,27 @@ const request = require("supertest");
 const app = require("../src/app");
 const connectDB = require("../src/db/connect");
 const Presentation = require("../src/models/presentations.model");
-const { presenterOneId, presenterOne, presenterTwo, presenterTwoId, presentationOne, presentationTwo, setupDatabase } = require("../src/db/seed-test");
+const { presenterOneId, presenterOne, presenterTwo, presenterTwoId, presentationOne, presentationTwo, setupDatabase, presenterThree, presenterThreeId } = require("../src/db/seed-test");
 connectDB();
 jest.setTimeout(10000);
-
 beforeEach(setupDatabase);
+
 test("Get welcome message", async () => {
   const response = await request(app).get("/api/presentations/welcome").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).expect(200);
 });
 
 describe("Create a presentation", () => {
-  test("Create a presentation", async () => {
-    const presenter = await request(app).post("/api/presentations").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({ title: "Creation of universe-2 " }).expect(201);
-    // console.log(presenter.body);
-
-    //console.log(response.body);
+  test("Create a presentation with proper given field", async () => {
+    const response = await request(app).post("/api/presentations").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({ title: "Creation of universe-2" }).expect(201);
+    const presentation = await Presentation.findById(response.body._id);
+    expect(presentation).not.toBeNull();
+    expect(presentation.title).toBe("Creation of universe-2");
+  });
+  test("Should not create a presentation without proper given field", async () => {
+    const response = await request(app).post("/api/presentations").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({}).expect(400);
+    const presentation = await Presentation.findById(response.body._id);
+    expect(response.body.msg).toBe("Provide necessary field");
+    expect(presentation).toBeNull();
   });
 });
 
@@ -26,23 +32,34 @@ describe("Get presentation by id", () => {
 
     expect(response.body.title).toBe("Chemical reaction 1");
   });
+
   test("Should not fetch presentation of other user", async () => {
     const response = await request(app).get(`/api/presentations/${presentationOne._id}`).set("Authorization", `Bearer ${presenterTwo.tokens[0].token}`).send().expect(404);
-    expect(response.body).toEqual({});
+    expect(response.body.msg).toEqual("requested resources not found");
   });
 });
 
 describe("Get presentations by a prasenter", () => {
   test("Should fetch all the presentations by a presenter", async () => {
     const presentations = await request(app).get(`/api/presentations/`).set("Authorization", `Bearer ${presenterTwo.tokens[0].token}`).send().expect(200);
-    //console.log(presentations.body.length);
     expect(presentations.body.length).toBe(2);
+  });
+  test("Should return error message if no presentations found", async () => {
+    const presentations = await request(app).get(`/api/presentations/`).set("Authorization", `Bearer ${presenterThree.tokens[0].token}`).send().expect(404);
+
+    expect(presentations.body.msg).toBe(`No item found with id ${presenterThreeId}`);
   });
 });
 
 describe("Delete presentation", () => {
   test("Should delete a presentation of an authenticated user", async () => {
     await request(app).delete(`/api/presentations/${presentationTwo._id}`).set("Authorization", `Bearer ${presenterTwo.tokens[0].token}`).send().expect(200);
+    const presentation = await Presentation.findById(presentationTwo._id);
+    expect(presentation).toBeNull();
+  });
+  test("Should send error message for invalid id", async () => {
+    const response = await request(app).delete(`/api/presentations/"627da9794e7b9cbfd2351345h"`).set("Authorization", `Bearer ${presenterTwo.tokens[0].token}`).send().expect(404);
+    expect(response.body.msg).toBe('No item found with id "627da9794e7b9cbfd2351345h"');
   });
 });
 describe("Update a presentation", () => {
@@ -56,45 +73,3 @@ describe("Update a presentation", () => {
     expect(presentation.title).toBe("Chemical reaction 1");
   });
 });
-
-/*
-beforeAll(async () => {
-  await db();
-});
-
-afterAll(async () => {
-  await mongoose.connection.close();
-});
-
-
-
-describe("GET /api/presentations/:sessionId", () => {
-  test("200: returns presentation data given session id", () => {
-    return request(app)
-      .get(`/api/presentations/${sessionId}`)
-      .expect(200)
-      .then(({ body }) => {
-        expect(body.presentation).toEqual(
-          expect.objectContaining({
-            sessionId: expect.any(String),
-            presentationId: expect.any(String),
-          })
-        );
-      });
-  });
-  test("404: sessionId not found", () => {
-    return request(app).get(`/api/presentations/INVALIDSESSIONID`).expect(404);
-  });
-});
-
-describe("GET /public/pivot_logo.png", () => {
-  test("200: returns image", () => {
-    return request(app)
-      .get("/public/pivot_logo.png")
-      .expect(200)
-      .then((res) => {
-        console.log(res);
-      });
-  });
-});
-*/
