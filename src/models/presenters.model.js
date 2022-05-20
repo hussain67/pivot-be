@@ -2,36 +2,41 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Presentation = require("./presentations.model");
-const presenterSchema = mongoose.Schema({
-  name: {
-    type: String,
-    trim: true,
-    required: [true, "Please provide name"],
-    minLength: [2, "Name must be atleast 2 character long"],
-    maxlength: [50, "Name length shoul not more than 30 character"]
-  },
-  email: {
-    type: String,
-    required: [true, "Please provide email"],
-    unique: true,
-    trim: true,
-    match: [/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, "Please provide valid email"]
-  },
-  password: {
-    type: String,
-    trim: true,
-    required: [true, "Please provide password"],
-    minLength: [6, "Password must be atleast 6 character long"]
-  },
-  tokens: [
-    {
-      token: {
-        type: String,
-        required: true
+const presenterSchema = mongoose.Schema(
+  {
+    name: {
+      type: String,
+      trim: true,
+      required: [true, "Please provide name"],
+      minLength: [2, "Name must be atleast 2 character long"],
+      maxlength: [50, "Name length shoul not more than 30 character"]
+    },
+    email: {
+      type: String,
+      required: [true, "Please provide email"],
+      unique: true,
+      trim: true,
+      match: [/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, "Please provide valid email"]
+    },
+    password: {
+      type: String,
+      trim: true,
+      required: [true, "Please provide password"],
+      minLength: [6, "Password must be atleast 6 character long"]
+    },
+    tokens: [
+      {
+        token: {
+          type: String,
+          required: true
+        }
       }
-    }
-  ]
-});
+    ]
+  },
+  {
+    timestamps: true
+  }
+);
 
 presenterSchema.virtual("presentations", {
   ref: "Presentation",

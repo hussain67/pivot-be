@@ -13,8 +13,9 @@ test("Get welcome message", async () => {
 
 describe("Create a presentation", () => {
   test("Create a presentation with proper given field", async () => {
-    const response = await request(app).post("/api/presentations").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({ title: "Creation of universe-2" }).expect(201);
+    const response = await request(app).post("/api/presentations").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({ title: "Creation of universe-2", slides: [] }).expect(201);
     const presentation = await Presentation.findById(response.body._id);
+    //console.log(presentation);
     expect(presentation).not.toBeNull();
     expect(presentation.title).toBe("Creation of universe-2");
   });
@@ -24,6 +25,18 @@ describe("Create a presentation", () => {
     expect(response.body.msg).toBe("Provide necessary field");
     expect(presentation).toBeNull();
   });
+  /*
+  test("Add slides to presentation", async () => {
+    await request(app)
+      .post("/api/presentations")
+      .set("Authorization", `Bearer ${presenterOne.tokens[0].token}`)
+      .send({ title: "Creation of universe-2", slides: { slideTitle: "Slide one" } });
+    const response = await request(app).post("/api/presentations").set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({ title: "Creation of universe-2", slideTitle: "Slide Two" }).expect(201);
+    const presentation = await Presentation.findById(response.body._id);
+    //console.log(presentation);
+    expect(presentation).not.toBeNull();
+    expect(presentation.title).toBe("Creation of universe-2");
+  });*/
 });
 
 describe("Get presentation by id", () => {
@@ -41,11 +54,12 @@ describe("Get presentation by id", () => {
 
 describe("Get presentations by a prasenter", () => {
   test("Should fetch all the presentations by a presenter", async () => {
-    const presentations = await request(app).get(`/api/presentations/`).set("Authorization", `Bearer ${presenterTwo.tokens[0].token}`).send().expect(200);
+    const presentations = await request(app).get(`/api/presentations`).set("Authorization", `Bearer ${presenterTwo.tokens[0].token}`).send().expect(200);
     expect(presentations.body.length).toBe(2);
   });
+
   test("Should return error message if no presentations found", async () => {
-    const presentations = await request(app).get(`/api/presentations/`).set("Authorization", `Bearer ${presenterThree.tokens[0].token}`).send().expect(404);
+    const presentations = await request(app).get(`/api/presentations`).set("Authorization", `Bearer ${presenterThree.tokens[0].token}`).send().expect(404);
 
     expect(presentations.body.msg).toBe(`No item found with id ${presenterThreeId}`);
   });
@@ -71,5 +85,17 @@ describe("Update a presentation", () => {
     await request(app).patch(`/api/presentations/${presentationOne._id}`).set("Authorization", `Bearer ${presenterTwo.tokens[0].token}`).send({ title: "updated title" }).expect(404);
     const presentation = await Presentation.findById(presentationOne._id);
     expect(presentation.title).toBe("Chemical reaction 1");
+  });
+});
+describe("Slides as a subdocument in a presentations", () => {
+  test("Create slide", async () => {
+    const response = await request(app).post(`/api/presentations/${presentationOne._id}/slides`).set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({ slideTitle: "slide two" }).expect(201);
+    expect(response.body.slides.length).toBe(2);
+  });
+  test("Get all slides", async () => {
+    await request(app).post(`/api/presentations/${presentationOne._id}/slides`).set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({ slideTitle: "slide two" });
+    const response = await request(app).get(`/api/presentations/${presentationOne._id}/slides`).set("Authorization", `Bearer ${presenterOne.tokens[0].token}`).send({}).expect(200);
+
+    expect(response.body.slides.length).toBe(2);
   });
 });

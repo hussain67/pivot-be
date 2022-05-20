@@ -30,6 +30,7 @@ const presenterThree = {
 const presentationOne = {
   _id: new mongoose.Types.ObjectId(),
   title: "Chemical reaction 1",
+  slides: [{ slideTitle: "Slide One" }],
   createdBy: presenterOne._id
 };
 const presentationTwo = {

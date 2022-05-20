@@ -34,17 +34,20 @@ const SlideSchema = new mongoose.Schema({
   //question: QuestionSchema,
 });
 
-const PresentationSchema = new mongoose.Schema({
-  title: { type: String, required: true },
+const PresentationSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
 
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Presenter",
+      required: [true, "Please provide presenter"]
+    },
 
-    required: [true, "Please provide presenter"],
-    ref: "Presenter"
-  }
-  //slides: [SlideSchema]
-});
+    slides: [SlideSchema]
+  },
+  { timestamps: true }
+);
 
 const Presentation = mongoose.model("Presentation", PresentationSchema);
 module.exports = Presentation;

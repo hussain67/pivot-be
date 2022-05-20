@@ -5,8 +5,7 @@ const url = process.env.MONGO_URI;
 
 const connectDB = async () => {
   return mongoose.connect(url, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+   
   });
 };
 
