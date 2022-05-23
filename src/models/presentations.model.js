@@ -27,11 +27,12 @@ const PresentationSchema = new mongoose.Schema({
 */
 
 const SlideSchema = new mongoose.Schema({
-  slideTitle: { type: String, required: true }
-  //slideImageUrl: { type: String, required: true },
-
-  //slideId: { type: String, required: true },
-  //question: QuestionSchema,
+  slideTitle: { 
+    type: String, 
+    required: true },
+  image:{
+    type: 'string' 
+  }
 });
 
 const PresentationSchema = new mongoose.Schema(

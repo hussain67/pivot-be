@@ -4,6 +4,7 @@ const cors = require("cors");
 app.use(cors());
 require("dotenv").config();
 const http = require("http");
+//const fileUpload = require("express-fileupload")
 app.server = http.createServer(app);
 
 const options = {
@@ -21,12 +22,13 @@ const invalideUrlMiddleware = require("./middleware/invalid-url");
 const errorHandlerMiddleware = require("./middleware/error-handler");
 //console.log(invalideUrlMiddleware);
 app.use(express.json());
+//app.use(fileUpload)
 
 app.use("/", home);
 app.use("/public", express.static("public"));
-app.use("/api/presenters", presentersRouter);
-app.use("/api/presentations", auth, presentationsRouter);
-app.use("/api", apiRouter);
+app.use("/api/v1/presenters", presentersRouter);
+app.use("/api/v1/presentations", auth, presentationsRouter);
+app.use("/v1/api", apiRouter);
 
 app.use("*", invalideUrlMiddleware);
 app.use(errorHandlerMiddleware);
