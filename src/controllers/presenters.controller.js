@@ -3,12 +3,14 @@ const { StatusCodes } = require("http-status-codes");
 const { UnauthenticatedError, BadRequestError } = require("../errors");
 
 const register = async (req, res, next) => {
-  const presenter = new Presenter(req.body);
+  console.log(req.body);
+  const { name, email, password } = req.body;
 
   try {
-    await presenter.save();
+    const presenter = await Presenter.create({ ...req.body });
     const token = await presenter.createJWT();
-    res.status(StatusCodes.CREATED).json({ presenter, token });
+
+    res.status(StatusCodes.CREATED).json({ presenter: { name: presenter.name, email: presenter.email, _id: presenter._id }, token });
   } catch (error) {
     next(error);
   }
@@ -16,22 +18,21 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   const { email, password } = req.body;
+  //console.log(email, password);
   try {
     if (!email || !password) {
-      throw new BadRequestError("Please provide email and password");
+      throw new BadRequestError("Email and Password are required");
     }
-
     const presenter = await Presenter.findOne({ email });
     if (!presenter) {
       throw new UnauthenticatedError("Invalid credentials");
     }
-    const isPasswordCorrect = await presenter.comparePassword(password);
+    const isPasswordCorrect = presenter.comparePassword(password);
     if (!isPasswordCorrect) {
       throw new UnauthenticatedError("Invalid credentials");
     }
-
     const token = await presenter.createJWT();
-    res.status(StatusCodes.OK).send({ presenter, token });
+    res.status(200).send({ presenter: { name: presenter.name, email: presenter.email, _id: presenter._id }, token });
   } catch (error) {
     next(error);
   }

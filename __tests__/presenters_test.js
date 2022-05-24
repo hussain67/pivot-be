@@ -1,18 +1,20 @@
 const request = require("supertest");
-require('dotenv').config()
+require("dotenv").config();
 const app = require("../src/app");
 const connectDB = require("../src/db/connect");
 const Presenter = require("../src/models/presenters.model");
 const { presenterOneId, presenterOne, setupDatabase } = require("../src/db/seed-test");
-const url = process.env.MONGO_URI_TEST
+const url = process.env.MONGO_URI_TEST;
 connectDB(url);
 jest.setTimeout(10000);
 
 beforeEach(setupDatabase);
 
-describe("Create new presenter", () => {
-  test("return status 201 and register a new prasenter", async () => {
+describe.only("Create new presenter", () => {
+  test.only("return status 201 and register a new prasenter", async () => {
     const response = await request(app).post("/api/v1/presenters/register").send({ name: "shahid", email: "shahid@shahid.com", password: "shahid12345" }).expect(201);
+    console.log(response.body.presenter);
+
     const presenter = await Presenter.findById(response.body.presenter._id);
     expect(presenter).not.toBeNull();
     expect(response.body).toMatchObject({
