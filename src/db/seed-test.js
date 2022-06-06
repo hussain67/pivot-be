@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const Presenter = require("../models/presenters.model");
-const Presentation = require("../models/presentations.model");
+const Presenter = require("../models/presentersModel");
+const Presentation = require("../models/presentationsModel");
 
 const presenterOneId = new mongoose.Types.ObjectId();
 const presenterOne = {

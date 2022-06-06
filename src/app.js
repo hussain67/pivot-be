@@ -1,38 +1,40 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
 app.use(cors());
 require("dotenv").config();
+
 const http = require("http");
-//const fileUpload = require("express-fileupload")
 app.server = http.createServer(app);
 
 const options = {
-  cors: true
-  //origins: ["http://localhost:3000/presentations/"]
+  cors: true,
+  origins: ["http://localhost:3000/presentations/"]
 };
 io = require("socket.io")(app.server, options);
 const home = require("./routes/home");
 const apiRouter = require("./routes/apiInfo");
-const presentersRouter = require("./routes/presenters.route");
-const presentationsRouter = require("./routes/presentations.route");
-const auth = require("./middleware/authentication");
+const authRouter = require("./routes/authRoutes");
+const userRouter = require("./routes/userRoutes");
+const presentationsRouter = require("./routes/presentationsRoute");
 
 const invalideUrlMiddleware = require("./middleware/invalid-url");
 const errorHandlerMiddleware = require("./middleware/error-handler");
-//console.log(invalideUrlMiddleware);
+app.use(morgan("tiny"));
 app.use(express.json());
-//app.use(fileUpload)
+app.use(cookieParser(process.env.JWT_SECRET));
 
 app.use("/", home);
 app.use("/public", express.static("public"));
-app.use("/api/v1/presenters", presentersRouter);
-app.use("/api/v1/presentations", auth, presentationsRouter);
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/presentations", presentationsRouter);
 app.use("/v1/api", apiRouter);
 
 app.use("*", invalideUrlMiddleware);
 app.use(errorHandlerMiddleware);
-//app.use(handleServerErrors);
 io.on("connection", socket => {
   console.log(`User connected ${socket.id}`);
 

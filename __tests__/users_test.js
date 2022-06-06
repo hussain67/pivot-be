@@ -1,8 +1,9 @@
 const request = require("supertest");
 require("dotenv").config();
 const app = require("../src/app");
+
 const connectDB = require("../src/db/connect");
-const Presenter = require("../src/models/presenters.model");
+const Presenter = require("../src/models/presentersModel");
 const { presenterOneId, presenterOne, setupDatabase } = require("../src/db/seed-test");
 const url = process.env.MONGO_URI_TEST;
 connectDB(url);
@@ -10,12 +11,12 @@ jest.setTimeout(10000);
 
 beforeEach(setupDatabase);
 
-describe.only("Create new presenter", () => {
-  test.only("return status 201 and register a new prasenter", async () => {
+describe("Create new presenter", () => {
+  test("return status 201 and register a new prasenter", async () => {
     const response = await request(app).post("/api/v1/presenters/register").send({ name: "shahid", email: "shahid@shahid.com", password: "shahid12345" }).expect(201);
-    console.log(response.body.presenter);
 
     const presenter = await Presenter.findById(response.body.presenter._id);
+
     expect(presenter).not.toBeNull();
     expect(response.body).toMatchObject({
       presenter: {
@@ -28,7 +29,7 @@ describe.only("Create new presenter", () => {
 
   test("Return status 400 and error message when name has less than two characer", async () => {
     const response = await request(app).post("/api/v1/presenters/register").send({ name: "s", email: "shahid@shahid.com", password: "shahid12345" }).expect(400);
-    expect(response.body.msg).toBe("Name must be atleast 2 character long");
+    expect(response.body.msg).toBe("Name must be atleast 3 character long");
   });
 });
 

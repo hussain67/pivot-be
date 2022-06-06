@@ -1,4 +1,4 @@
-const Presentation = require("../models/presentations.model");
+const Presentation = require("../models/presentationsModel");
 const { BadRequestError, NotFoundError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
 const getPresentationWelcomeMessage = async (req, res) => {
