@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { postPresentation, getPresentationWelcomeMessage, getPresentationById, getPresentations, deletePresentationById, updatePresentationById, createSlide, fetchAllSlides } = require("../controllers/presentationsController");
+const { postPresentation, getPresentationWelcomeMessage, getPresentationById, getPresentations, deletePresentationById, updatePresentationById, createSlide, fetchAllSlides } = require("../controllers/presentationController");
 
 router.post("/", postPresentation);
 router.get("/welcome", getPresentationWelcomeMessage);

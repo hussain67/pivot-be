@@ -1,4 +1,4 @@
-const Presentation = require("../models/presentationsModel");
+const Presentation = require("../models/presentationModel");
 const { BadRequestError, NotFoundError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
 const getPresentationWelcomeMessage = async (req, res) => {
@@ -10,8 +10,8 @@ const postPresentation = async (req, res, next) => {
     if (!req.body.title) {
       throw new BadRequestError("Provide necessary field");
     }
-    const response = await new Presentation({ ...req.body, createdBy: req.presenter._id }).save();
-    res.status(201).send(response);
+    const presentation = await new Presentation({ ...req.body, createdBy: req.presenter._id }).save();
+    res.status(201).send(presentation);
   } catch (error) {
     next(error);
   }

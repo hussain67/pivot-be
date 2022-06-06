@@ -1,5 +1,7 @@
 node_modules
-
-.env
-
+.env.development
+.env.test
+dev.env
+test.env
+*.env
 NOTE.md

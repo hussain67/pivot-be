@@ -8,7 +8,6 @@ const authenticateUser = async (req, res, next) => {
   }
   try {
     const payload = isTokenValid({ token });
-    // console.log(payload);
     const { name, userId, role } = payload;
     req.user = { name, userId, role };
     next();

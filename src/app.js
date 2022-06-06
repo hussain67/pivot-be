@@ -18,7 +18,7 @@ const home = require("./routes/home");
 const apiRouter = require("./routes/apiInfo");
 const authRouter = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
-const presentationsRouter = require("./routes/presentationsRoute");
+const presentationsRouter = require("./routes/presentationsRoutes");
 
 const invalideUrlMiddleware = require("./middleware/invalid-url");
 const errorHandlerMiddleware = require("./middleware/error-handler");
@@ -31,7 +31,7 @@ app.use("/public", express.static("public"));
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/presentations", presentationsRouter);
-app.use("/v1/api", apiRouter);
+app.use("/api/v1", apiRouter);
 
 app.use("*", invalideUrlMiddleware);
 app.use(errorHandlerMiddleware);
