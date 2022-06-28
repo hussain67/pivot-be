@@ -5,8 +5,9 @@ const { UnauthenticatedError, BadRequestError } = require("../errors");
 const { attachCookiesToResponse, createTokenUser } = require("../utils");
 
 const register = async (req, res, next) => {
+  console.log(req.body);
   const { name, email, password } = req.body;
-  console.log(name);
+
   try {
     // first registered user is an admin
     const isFirstAccount = (await User.countDocuments({})) === 0;
@@ -18,13 +19,14 @@ const register = async (req, res, next) => {
     }
     const tokenUser = createTokenUser(user);
     attachCookiesToResponse({ res, user: tokenUser });
-    res.status(StatusCodes.OK).json({ user: tokenUser });
+    res.status(StatusCodes.CREATED).json({ user: { name: user.name } });
   } catch (error) {
     next(error);
   }
 };
 
 const login = async (req, res, next) => {
+  console.log(req.body);
   const { email, password } = req.body;
   if (!email || !password) {
     throw new BadRequestError("Email and password are required");
@@ -40,7 +42,7 @@ const login = async (req, res, next) => {
     }
     const tokenUser = createTokenUser(user);
     attachCookiesToResponse({ res, user: tokenUser });
-    res.status(StatusCodes.OK).json({ user: tokenUser });
+    res.status(StatusCodes.OK).json({ user: { name: user.name } });
   } catch (error) {
     next(error);
   }

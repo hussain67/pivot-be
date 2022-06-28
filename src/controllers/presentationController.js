@@ -1,17 +1,20 @@
 const Presentation = require("../models/presentationModel");
 const { BadRequestError, NotFoundError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
+const cloudinary = require("cloudinary").v2;
 const getPresentationWelcomeMessage = async (req, res) => {
   await res.status(200).send({ msg: "Welcome from controller" });
 };
 
-const postPresentation = async (req, res, next) => {
+const createPresentation = async (req, res, next) => {
+  console.log(req.user);
   try {
     if (!req.body.title) {
       throw new BadRequestError("Provide necessary field");
     }
-    const presentation = await new Presentation({ ...req.body, createdBy: req.presenter._id }).save();
-    res.status(201).send(presentation);
+    const presentation = await new Presentation({ ...req.body, createdBy: req.user.userId }).save();
+    console.log(presentation);
+    res.status(201).json(presentation);
   } catch (error) {
     next(error);
   }
@@ -20,27 +23,21 @@ const postPresentation = async (req, res, next) => {
 const getPresentationById = async (req, res, next) => {
   const { id } = req.params;
   try {
-    const presentation = await Presentation.findOne({ _id: id, createdBy: req.presenter._id });
+    const presentations = await Presentation.findOne({ _id: id, createdBy: req.user.userId });
 
-    if (!presentation) {
+    if (!presentations) {
       throw new NotFoundError("requested resources not found");
     }
-    res.status(StatusCodes.OK).send(presentation);
+    res.status(StatusCodes.OK).send(presentations);
   } catch (error) {
     next(error);
   }
 };
 const getPresentations = async (req, res, next) => {
-  const id = req.presenter._id;
+  const id = req.user.userId;
 
   try {
     const presentations = await Presentation.find({ createdBy: id });
-    /*
-    const presentation = await Presentation.findOne({ _id: presentationId, createdBy: id });
-
-    const presentations = await presentation.populate("createdBy").execPopulate();
-    console.log(presentations);
-    */
     if (presentations.length === 0) {
       throw new NotFoundError(`No item found with id ${id}`);
     }
@@ -53,18 +50,19 @@ const getPresentations = async (req, res, next) => {
 const deletePresentationById = async (req, res, next) => {
   const { id } = req.params;
   try {
-    const presentation = await Presentation.findOneAndDelete({ _id: id, createdBy: req.presenter._id });
+    const presentation = await Presentation.findOneAndDelete({ _id: id, createdBy: req.user.userId });
     if (!presentation) {
       throw new NotFoundError(`No presentation found with id ${id}`);
     }
-    res.status(StatusCodes.OK).send();
+    res.status(StatusCodes.OK).json(presentation);
   } catch (error) {
     next(error);
   }
 };
 const updatePresentationById = async (req, res, next) => {
+  console.log(req.params);
   const updates = Object.keys(req.body);
-  const allowableUpdates = ["title", "createdBy"];
+  const allowableUpdates = ["title"];
   const isValidOperation = updates.every(update => {
     return allowableUpdates.includes(update);
   });
@@ -72,7 +70,7 @@ const updatePresentationById = async (req, res, next) => {
     throw new BadRequestError("Invalid updates");
   }
   try {
-    const presentation = await Presentation.findOne({ _id: req.params.id, createdBy: req.presenter._id });
+    const presentation = await Presentation.findOne({ _id: req.params.id, createdBy: req.user.userId });
     if (!presentation) {
       throw new NotFoundError(`No item found with id ${req.params.id}`);
     }
@@ -85,27 +83,39 @@ const updatePresentationById = async (req, res, next) => {
     next(error);
   }
 };
+const uploadSlideImage = async (req, res) => {
+  //console.log(req.files.image);
+  const result = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
+    use_filename: true,
+    folder: "pivot"
+  });
+  console.log(result);
+  res.status(StatusCodes.OK).json({ image: { src: result.secure_url } });
+};
+
 const createSlide = async (req, res, next) => {
   const { id } = req.params;
+  console.log(req.body);
   try {
-    if (!req.body.slideTitle) {
+    if (!req.body.slideTitle || !req.body.slideBody) {
       throw new BadRequestError("Provide necessary field");
     }
-    const presentation = await Presentation.findById(id);
-    presentation.slides.push({ ...req.body });
+    const presentation = await Presentation.findOne({ _id: req.params.id, createdBy: req.user.userId });
 
+    const count = presentation.slides.push({ ...req.body });
+    const slideId = presentation.slides[count - 1]._id;
     const response = await presentation.save();
-    res.status(201).send(response);
+    res.status(201).send(slideId);
   } catch (error) {
     next(error);
   }
 };
 const fetchAllSlides = async (req, res, next) => {
   try {
-    const presentation = await Presentation.findOne({ _id: req.params.id, createdBy: req.presenter._id });
-    res.status(200).send(presentation);
+    const presentation = await Presentation.findOne({ _id: req.params.id, createdBy: req.user.userId });
+    res.status(200).send(presentation.slides);
   } catch (error) {
     next(error);
   }
 };
-module.exports = { postPresentation, getPresentationById, getPresentationWelcomeMessage, getPresentations, deletePresentationById, updatePresentationById, createSlide, fetchAllSlides };
+module.exports = { createPresentation, getPresentationById, getPresentationWelcomeMessage, getPresentations, deletePresentationById, updatePresentationById, createSlide, fetchAllSlides, uploadSlideImage };

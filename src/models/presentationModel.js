@@ -27,22 +27,35 @@ const PresentationSchema = new mongoose.Schema({
 */
 
 const SlideSchema = new mongoose.Schema({
-  slideTitle: { 
-    type: String, 
-    required: true },
-  image:{
-    type: 'string' 
+  slideTitle: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  slideBody: {
+    type: String,
+    require: true
+  },
+  slideImage: {
+    type: "string"
+  },
+  slideQuestion: {
+    type: "string"
   }
 });
 
 const PresentationSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true },
+    title: {
+      type: String,
+      required: [true, "Please provide a title for presentation"],
+      unique: true
+    },
 
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Presenter",
-      required: [true, "Please provide presenter"]
+      ref: "User",
+      required: [true, "Please provide user"]
     },
 
     slides: [SlideSchema]
