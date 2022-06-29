@@ -104,12 +104,27 @@ const createSlide = async (req, res, next) => {
 
     const count = presentation.slides.push({ ...req.body });
     const slideId = presentation.slides[count - 1]._id;
-    const response = await presentation.save();
-    res.status(201).send(slideId);
+    await presentation.save();
+    res.status(201).json(slideId);
   } catch (error) {
     next(error);
   }
 };
+
+const getSlideById = async (req, res, next) => {
+  const { presentationId, slideId } = req.params;
+  //console.log(typeof slideId);
+  try {
+    const presentation = await Presentation.findOne({ _id: presentationId, createdBy: req.user.userId });
+    console.log(presentation);
+    const slide = await presentation.slides.id(slideId);
+    // console.log(slide);
+    res.status(200).json(slide);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const fetchAllSlides = async (req, res, next) => {
   try {
     const presentation = await Presentation.findOne({ _id: req.params.id, createdBy: req.user.userId });
@@ -118,4 +133,4 @@ const fetchAllSlides = async (req, res, next) => {
     next(error);
   }
 };
-module.exports = { createPresentation, getPresentationById, getPresentationWelcomeMessage, getPresentations, deletePresentationById, updatePresentationById, createSlide, fetchAllSlides, uploadSlideImage };
+module.exports = { createPresentation, getPresentationById, getPresentationWelcomeMessage, getPresentations, deletePresentationById, updatePresentationById, createSlide, getSlideById, fetchAllSlides, uploadSlideImage };
