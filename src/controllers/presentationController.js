@@ -1,6 +1,7 @@
 const Presentation = require("../models/presentationModel");
 const { BadRequestError, NotFoundError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
+const fs = require("fs");
 const cloudinary = require("cloudinary").v2;
 const getPresentationWelcomeMessage = async (req, res) => {
   await res.status(200).send({ msg: "Welcome from controller" });
@@ -13,7 +14,7 @@ const createPresentation = async (req, res, next) => {
       throw new BadRequestError("Provide necessary field");
     }
     const presentation = await new Presentation({ ...req.body, createdBy: req.user.userId }).save();
-    console.log(presentation);
+    //console.log(presentation);
     res.status(201).json(presentation);
   } catch (error) {
     next(error);
@@ -60,8 +61,9 @@ const deletePresentationById = async (req, res, next) => {
   }
 };
 const updatePresentationById = async (req, res, next) => {
-  console.log(req.params);
+  // console.log(req.params);
   const updates = Object.keys(req.body);
+  console.log(updates);
   const allowableUpdates = ["title"];
   const isValidOperation = updates.every(update => {
     return allowableUpdates.includes(update);
@@ -89,13 +91,14 @@ const uploadSlideImage = async (req, res) => {
     use_filename: true,
     folder: "pivot"
   });
-  console.log(result);
+  //console.log(result);
+  fs.unlinkSync(req.files.image.tempFilePath);
   res.status(StatusCodes.OK).json({ image: { src: result.secure_url } });
 };
 
 const createSlide = async (req, res, next) => {
   const { id } = req.params;
-  console.log(req.body);
+  //console.log(req.body);
   try {
     if (!req.body.slideTitle || !req.body.slideBody) {
       throw new BadRequestError("Provide necessary field");
@@ -116,10 +119,49 @@ const getSlideById = async (req, res, next) => {
   //console.log(typeof slideId);
   try {
     const presentation = await Presentation.findOne({ _id: presentationId, createdBy: req.user.userId });
-    console.log(presentation);
+    //console.log(presentation);
     const slide = await presentation.slides.id(slideId);
-    // console.log(slide);
     res.status(200).json(slide);
+  } catch (error) {
+    next(error);
+  }
+};
+const deleteSlideById = async (req, res, next) => {
+  const { presentationId, slideId } = req.params;
+  try {
+    const presentation = await Presentation.findOne({ _id: presentationId, createdBy: req.user.userId });
+    //console.log(presentation);
+    const slide = await presentation.slides.id(slideId).remove();
+    await presentation.save();
+    console.log(slide);
+    res.status(200).json(slide);
+  } catch (error) {
+    next(error);
+  }
+};
+const updateSlideById = async (req, res, next) => {
+  const { presentationId, slideId } = req.params;
+  console.log(req.body);
+  const updates = Object.keys(req.body);
+  console.log(updates);
+  const allowableUpdates = ["slideTitle", "slideBody", "slideImage", "slideQuestion", "_id"];
+  const isValidOperation = updates.every(update => {
+    return allowableUpdates.includes(update);
+  });
+  if (!isValidOperation) {
+    throw new BadRequestError("Invalid updates");
+  }
+  try {
+    const presentation = await Presentation.findOne({ _id: presentationId, createdBy: req.user.userId });
+    if (!presentation) {
+      throw new NotFoundError(`No item found with id ${presentationId}`);
+    }
+    const slide = await presentation.slides.id(slideId);
+    updates.forEach(update => {
+      return (slide[update] = req.body[update]);
+    });
+    await presentation.save();
+    res.status(200).send(slide);
   } catch (error) {
     next(error);
   }
@@ -133,4 +175,4 @@ const fetchAllSlides = async (req, res, next) => {
     next(error);
   }
 };
-module.exports = { createPresentation, getPresentationById, getPresentationWelcomeMessage, getPresentations, deletePresentationById, updatePresentationById, createSlide, getSlideById, fetchAllSlides, uploadSlideImage };
+module.exports = { createPresentation, getPresentationById, getPresentationWelcomeMessage, getPresentations, deletePresentationById, updatePresentationById, createSlide, getSlideById, deleteSlideById, fetchAllSlides, uploadSlideImage, updateSlideById };

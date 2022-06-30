@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { createPresentation, getPresentationWelcomeMessage, getPresentationById, getPresentations, deletePresentationById, updatePresentationById, createSlide, fetchAllSlides, uploadSlideImage, getSlideById } = require("../controllers/presentationController");
+const { createPresentation, getPresentationWelcomeMessage, getPresentationById, getPresentations, deletePresentationById, updatePresentationById, createSlide, fetchAllSlides, uploadSlideImage, getSlideById, deleteSlideById, updateSlideById } = require("../controllers/presentationController");
 
 router.post("/", createPresentation);
 router.get("/welcome", getPresentationWelcomeMessage);
@@ -13,6 +13,8 @@ router.post("/uploads", uploadSlideImage);
 router.post("/:id/slides", createSlide);
 router.get("/:id/slides", fetchAllSlides);
 router.get("/:presentationId/slides/:slideId", getSlideById);
+router.delete("/:presentationId/slides/:slideId", deleteSlideById);
+router.patch("/:presentationId/slides/:slideId", updateSlideById);
 //router.get("/slides/:slideId", getSlideById);
 
 module.exports = router;
