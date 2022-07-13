@@ -23,6 +23,7 @@ const { authenticateUser } = require("./middleware/authentication");
 
 const invalideUrlMiddleware = require("./middleware/invalid-url");
 const errorHandlerMiddleware = require("./middleware/error-handler");
+const { savePresenter, getIdOfPresenter } = require("./utils/presenter");
 app.use(morgan("tiny"));
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
@@ -49,23 +50,46 @@ io = require("socket.io")(app.server, options);
 io.on("connection", socket => {
   console.log(`User connected ${socket.id}`);
 
-  socket.on("student_submit_response", data => {
-    console.log(data, "<<form data from student fe");
-    io.emit("new_response", data);
+  socket.on("current-slide", obj => {
+    console.log(`${obj}-current presentation slide`);
+    io.emit("current-slide", obj);
   });
 
-  socket.on("teacher_current_slide", slideId => {
-    console.log(`${slideId}-current presentation slide`);
-    io.emit("current_slide", slideId);
+  socket.on("end-message", msg => {
+    io.emit("end-message", msg);
   });
 
-  socket.on("teacher_slide_stop", slideId => {
-    console.log(`${slideId}-Stopped`);
-    io.emit("current_slide_stopped", slideId);
+  socket.on("join", ({ username, room }) => {
+    console.log(username, room, socket.id);
+
+    if (username === "presenter") {
+      savePresenter(socket.id, room);
+    }
+
+    socket.join(room);
+
+    socket.broadcast.to(room).emit("join-message", ` ${username} has joined`);
+  });
+  socket.on("poll-started", ({ room }) => {
+    socket.broadcast.to(room).emit("new-poll");
   });
 
-  socket.on("disconnect", () => {
-    console.log("user disconnected", socket.id);
+  socket.on("answer", ({ room, answer }) => {
+    const id = getIdOfPresenter(room);
+    console.log(id);
+
+    io.to(id).emit("new-answer", answer);
+  });
+
+  socket.on("chart-data", ({ chartData, room }) => {
+    socket.broadcast.to(room).emit("new-chart-data", chartData);
+    console.log(chartData);
+    console.log(room);
+  });
+
+  socket.on("poll-result", room => {
+    console.log(result);
+    socket.to(room).emit("result", result);
   });
 });
 
