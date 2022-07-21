@@ -3,18 +3,19 @@ const { BadRequestError, NotFoundError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
 const fs = require("fs");
 const cloudinary = require("cloudinary").v2;
+
 const getPresentationWelcomeMessage = async (req, res) => {
   await res.status(200).send({ msg: "Welcome from controller" });
 };
 
 const createPresentation = async (req, res, next) => {
-  console.log(req.user);
+  //console.log(req.user);
   try {
     if (!req.body.title) {
       throw new BadRequestError("Provide necessary field");
     }
     const presentation = await new Presentation({ ...req.body, createdBy: req.user.userId }).save();
-    //console.log(presentation);
+    console.log(presentation);
     res.status(201).json(presentation);
   } catch (error) {
     next(error);

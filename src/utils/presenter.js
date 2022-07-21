@@ -1,8 +1,16 @@
-const presenters = [];
+let presenters = [];
 
 const savePresenter = (id, room) => {
   presenters.push({ id, room });
-  // console.log(presenters);
+
+  console.log(presenters);
+};
+
+const removePresenter = id => {
+  presenters = presenters.filter(presenter => {
+    return presenter.id != id;
+  });
+  console.log(presenters);
 };
 
 const getIdOfPresenter = room => {
@@ -12,4 +20,4 @@ const getIdOfPresenter = room => {
   return presenter.id;
 };
 
-module.exports = { savePresenter, getIdOfPresenter };
+module.exports = { savePresenter, removePresenter, getIdOfPresenter };

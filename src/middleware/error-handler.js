@@ -24,7 +24,7 @@ const errorHandlerMiddleware = (err, req, res, next) => {
   if (err.name === "JsonWebTokenError" && err.message === "jwt malformed") {
     (customError.statusCode = 401), (customError.msg = "Authentication failed");
   }
-
+  console.log(customError.statusCode, customError.msg);
   return res.status(customError.statusCode).json({ msg: customError.msg });
 };
 

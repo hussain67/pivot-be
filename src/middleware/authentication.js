@@ -1,10 +1,13 @@
 const { isTokenValid } = require("../utils");
-const CustomError = require("../errors");
+//const CustomError = require("../errors");
 
 const authenticateUser = async (req, res, next) => {
   const token = req.signedCookies.token;
+  console.log(token);
   if (!token) {
-    throw new CustomError.UnauthenticatedError("Authentication invalid");
+    //throw new CustomError.UnauthenticatedError("Authentication invalid");
+    res.status(401).json("");
+    return;
   }
   try {
     const payload = isTokenValid({ token });
