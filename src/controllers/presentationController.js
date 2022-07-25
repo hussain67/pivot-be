@@ -134,7 +134,7 @@ const deleteSlideById = async (req, res, next) => {
     //console.log(presentation);
     const slide = await presentation.slides.id(slideId).remove();
     await presentation.save();
-    console.log(slide);
+    console.log(slide, "Slide deleted");
     res.status(200).json(slide);
   } catch (error) {
     next(error);
