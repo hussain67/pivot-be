@@ -54,53 +54,47 @@ io.on("connection", socket => {
   console.log(`User connected ${socket.id}`);
 
   socket.on("join", ({ username, room }, callback) => {
-    //console.log(username, room, socket.id);
     const { error, user } = addUser({ id: socket.id, username, room });
     if (error) {
       return callback(error);
     }
 
     socket.join(user.room);
-    // console.log(user);
-    //return res;
-    // socket.broadcast.to(room).emit("join-message", ` ${username} has joined`);
     callback(null, user);
   });
 
   socket.on("disconnect", () => {
     removeUser(socket.id);
-    //removePresenter(socket.id);
   });
 
-  socket.on("current-slide", ({ slide }) => {
-    //console.log(`${slide}-current presentation slide`);
-    const user = getUser(socket.id);
-    //console.log(user.room, "Room");
-    // io.emit("current-slide", obj);
-    socket.broadcast.to(user.room).emit("current-slide", slide);
-  });
+  socket.on("remove-user", () => {
+    removeUser(socket.id);
+  }),
+    socket.on("current-slide", ({ slide }) => {
+      const user = getUser(socket.id);
+      if (user) {
+        socket.broadcast.to(user.room).emit("current-slide", { slide, room: user.room });
+      }
+    });
 
   socket.on("poll-started", ({ poolQuestion }) => {
     const user = getUser(socket.id);
-    socket.broadcast.to(user.room).emit("new-poll", poolQuestion);
+    if (user) {
+      socket.broadcast.to(user.room).emit("new-poll", poolQuestion);
+    }
   });
 
   socket.on("answer", ({ room, answer }) => {
-    //const id = getIdOfPresenter(room);
-    // console.log(id);
     const presenter = getPresenter(room);
-    io.to(presenter.id).emit("new-answer", answer);
+    if (presenter) {
+      io.to(presenter.id).emit("new-answer", answer);
+    }
   });
 
-  socket.on("chart-data", ({ chartData, room }) => {
-    socket.broadcast.to(room).emit("new-chart-data", chartData);
-    console.log(chartData);
-    console.log(room);
-  });
-
-  socket.on("poll-result", room => {
-    console.log(result);
-    socket.to(room).emit("result", result);
+  socket.on("poll-result", ({ chartData, totalCount, room }) => {
+    socket.broadcast.to(room).emit("new-poll-result", { chartData, totalCount });
+    //console.log(chartData);
+    // console.log(totalCount);
   });
 });
 

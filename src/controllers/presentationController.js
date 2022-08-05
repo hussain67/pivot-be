@@ -15,7 +15,7 @@ const createPresentation = async (req, res, next) => {
       throw new BadRequestError("Provide necessary field");
     }
     const presentation = await new Presentation({ ...req.body, createdBy: req.user.userId }).save();
-    console.log(presentation);
+    // console.log(presentation);
     res.status(201).json(presentation);
   } catch (error) {
     next(error);
@@ -64,7 +64,7 @@ const deletePresentationById = async (req, res, next) => {
 const updatePresentationById = async (req, res, next) => {
   // console.log(req.params);
   const updates = Object.keys(req.body);
-  console.log(updates);
+  //console.log(updates);
   const allowableUpdates = ["title"];
   const isValidOperation = updates.every(update => {
     return allowableUpdates.includes(update);
@@ -134,7 +134,7 @@ const deleteSlideById = async (req, res, next) => {
     //console.log(presentation);
     const slide = await presentation.slides.id(slideId).remove();
     await presentation.save();
-    console.log(slide, "Slide deleted");
+    //console.log(slide, "Slide deleted");
     res.status(200).json(slide);
   } catch (error) {
     next(error);
@@ -142,9 +142,9 @@ const deleteSlideById = async (req, res, next) => {
 };
 const updateSlideById = async (req, res, next) => {
   const { presentationId, slideId } = req.params;
-  console.log(req.body);
+  //console.log(req.body);
   const updates = Object.keys(req.body);
-  console.log(updates);
+  //console.log(updates);
   const allowableUpdates = ["slideTitle", "slideBody", "slideImage", "slideQuestion", "_id"];
   const isValidOperation = updates.every(update => {
     return allowableUpdates.includes(update);

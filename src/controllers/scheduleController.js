@@ -24,9 +24,14 @@ const createSchedule = async (req, res, next) => {
 const getScheduleParticipant = async (req, res, next) => {
   try {
     const response = await Schedule.findOne();
+    const sortedItems = response.items.sort((a, b) => {
+      const dateB = new Date(b.time);
+      const dateA = new Date(a.time);
 
+      return dateA - dateB;
+    });
     if (response) {
-      res.status(200).json(response.items);
+      res.status(200).json(sortedItems);
     }
   } catch (error) {
     console.log(error);
@@ -39,7 +44,7 @@ const getSchedulePresenter = async (req, res, next) => {
       const ownSchedule = response.items.filter(item => {
         return item.userId === req.user.userId;
       });
-      console.log(ownSchedule);
+      //console.log(ownSchedule);
       res.status(200).json(ownSchedule);
     }
   } catch (error) {
@@ -48,7 +53,6 @@ const getSchedulePresenter = async (req, res, next) => {
 };
 const deleteScheduleById = async (req, res, next) => {
   const { itemId } = req.params;
-  console.log(itemId);
   try {
     const schedule = await Schedule.findOne();
     await schedule.items.id(itemId).remove();

@@ -1,9 +1,6 @@
 const customErrors = require("../errors");
 
 const checkPermissions = (requser, resourceUserId) => {
-  // console.log(requser);
-  // console.log(resourceUserId);
-  // console.log(typeof resourceUserId);
   if (requser.role === "admin") return;
   if (requser.userId === resourceUserId.toString()) return;
   throw new customErrors.UnauthorizedError("Not authorized to access this route");

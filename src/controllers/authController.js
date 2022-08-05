@@ -5,7 +5,7 @@ const { UnauthenticatedError, BadRequestError } = require("../errors");
 const { attachCookiesToResponse, createTokenUser } = require("../utils");
 
 const register = async (req, res, next) => {
-  console.log(req.body);
+  // console.log(req.body);
   const { name, email, password } = req.body;
 
   try {
@@ -26,7 +26,7 @@ const register = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
-  console.log(req.body);
+  //console.log(req.body);
   const { email, password } = req.body;
   if (!email || !password) {
     throw new BadRequestError("Email and password are required");

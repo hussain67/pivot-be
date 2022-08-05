@@ -4,7 +4,7 @@ const removeUser = id => {
   //console.log(users);
   const index = users.findIndex(user => user.id === id);
   let removedUser = users.splice(index, 1)[0];
-  // console.log(users);
+  //console.log(users);
   return removedUser;
 };
 const addUser = ({ id, username, room }) => {
@@ -19,17 +19,9 @@ const addUser = ({ id, username, room }) => {
     };
   }
 
-  //Check that user is not joined in another room
-  /*
-  const inAnotherRoom = users.find(user => {
-    return user.id === id;
-  });
-  if (inAnotherRoom) {
-    removeUser(id);
-  }*/
   // Check for existing user
   const existingUser = users.find(user => {
-    return user.room === room && user.username === username;
+    return user.room === room && user.username === username && user.id !== id;
   });
 
   // Validate username
@@ -38,10 +30,16 @@ const addUser = ({ id, username, room }) => {
       error: "This username already in use"
     };
   }
+  const alreadyJoined = users.find(user => {
+    return user.id === id;
+  });
+  if (alreadyJoined) {
+    removeUser(id);
+  }
   // Store user
   const user = { id, username, room };
   users.push(user);
-  console.log(users);
+  //console.log(users, "users Api");
   return { user };
 };
 
