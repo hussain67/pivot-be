@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { createPresentation, getPresentationWelcomeMessage, getPresentationById, getPresentations, deletePresentationById, updatePresentationById, createSlide, fetchAllSlides, uploadSlideImage, getSlideById, deleteSlideById, updateSlideById } = require("../controllers/presentationController");
 
-router.post("/", createPresentation);
+router.post("/create", createPresentation);
 router.get("/welcome", getPresentationWelcomeMessage);
 router.get("/", getPresentations);
 router.get("/:id", getPresentationById);

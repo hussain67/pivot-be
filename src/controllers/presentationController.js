@@ -9,13 +9,14 @@ const getPresentationWelcomeMessage = async (req, res) => {
 };
 
 const createPresentation = async (req, res, next) => {
-  //console.log(req.user);
+  console.log(req.user);
+  console.log({ ...req.body });
   try {
     if (!req.body.title) {
-      throw new BadRequestError("Provide necessary field");
+      throw new BadRequestError("Provide necessary field!!!!");
     }
-    const presentation = await new Presentation({ ...req.body, createdBy: req.user.userId }).save();
-    // console.log(presentation);
+    const presentation = await new Presentation({ ...req.body, createdBy: req.user.userId, slides: [{ slideTitle: ` ${req.body.title}` }] }).save();
+    console.log(presentation);
     res.status(201).json(presentation);
   } catch (error) {
     next(error);

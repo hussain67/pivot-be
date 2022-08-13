@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const SlideSchema = new mongoose.Schema({
   slideTitle: {
     type: String,
@@ -11,9 +10,6 @@ const SlideSchema = new mongoose.Schema({
     require: true
   },
   slideImage: {
-    type: "string"
-  },
-  slideQuestion: {
     type: "string"
   }
 });
