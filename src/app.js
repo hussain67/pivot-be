@@ -13,6 +13,7 @@ cloudinary.config({
 });
 app.use(cors());
 require("dotenv").config();
+app.enable("trust proxy");
 
 const home = require("./routes/home");
 const apiRouter = require("./routes/apiInfo");
@@ -24,7 +25,6 @@ const { authenticateUser } = require("./middleware/authentication");
 
 const invalideUrlMiddleware = require("./middleware/invalid-url");
 const errorHandlerMiddleware = require("./middleware/error-handler");
-const { savePresenter, removePresenter, getIdOfPresenter } = require("./utils/presenter");
 const { addUser, getUser, removeUser, getPresenter, getUsersInRoom } = require("./utils/users");
 app.use(morgan("tiny"));
 app.use(express.json());
@@ -37,7 +37,6 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/presentations", authenticateUser, presentationsRouter);
 app.use("/api/v1/schedule", scheduleRouter);
-//app.use("/api/v1", apiRouter);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use("*", invalideUrlMiddleware);
 app.use(errorHandlerMiddleware);
@@ -93,8 +92,6 @@ io.on("connection", socket => {
 
   socket.on("poll-result", ({ chartData, totalCount, room }) => {
     socket.broadcast.to(room).emit("new-poll-result", { chartData, totalCount });
-    //console.log(chartData);
-    // console.log(totalCount);
   });
 });
 
