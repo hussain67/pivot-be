@@ -12,6 +12,7 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET
 });
 app.use(cors());
+app.options("*", cors());
 require("dotenv").config();
 app.enable("trust proxy");
 
