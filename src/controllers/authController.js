@@ -18,7 +18,7 @@ const register = async (req, res, next) => {
       throw new BadRequestError("Invalid credentials");
     }
     const tokenUser = createTokenUser(user);
-    attachCookiesToResponse({ res, user: tokenUser });
+    attachCookiesToResponse({ req, res, user: tokenUser });
     res.status(StatusCodes.CREATED).json({ user: { name: user.name } });
   } catch (error) {
     next(error);
@@ -41,7 +41,7 @@ const login = async (req, res, next) => {
       throw new UnauthenticatedError("Invalid credentials");
     }
     const tokenUser = createTokenUser(user);
-    attachCookiesToResponse({ res, user: tokenUser });
+    attachCookiesToResponse({ req, res, user: tokenUser });
     res.status(StatusCodes.OK).json({ user: { name: user.name } });
   } catch (error) {
     next(error);
