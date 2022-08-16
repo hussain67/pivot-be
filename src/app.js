@@ -11,10 +11,10 @@ cloudinary.config({
   api_key: process.env.CLOUD_API_KEY,
   api_secret: process.env.CLOUD_API_SECRET
 });
-app.use(cors());
-app.options("https://pivot-a.netlify.app", cors());
+app.use(cors({ origin: "https://pivot-a.netlify.app" }));
+//app.options("https://pivot-a.netlify.app", cors());
 require("dotenv").config();
-app.enable("trust proxy");
+app.enable("trust proxy", 1);
 
 const home = require("./routes/home");
 const apiRouter = require("./routes/apiInfo");
