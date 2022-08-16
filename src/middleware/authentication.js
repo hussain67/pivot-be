@@ -6,7 +6,7 @@ const authenticateUser = async (req, res, next) => {
   //console.log(token);
   if (!token) {
     //throw new CustomError.UnauthenticatedError("Authentication invalid");
-    res.status(401).json("");
+    res.status(401).json("No token present");
     return;
   }
   try {

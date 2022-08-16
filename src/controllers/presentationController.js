@@ -118,10 +118,8 @@ const createSlide = async (req, res, next) => {
 
 const getSlideById = async (req, res, next) => {
   const { presentationId, slideId } = req.params;
-  //console.log(typeof slideId);
   try {
     const presentation = await Presentation.findOne({ _id: presentationId, createdBy: req.user.userId });
-    //console.log(presentation);
     const slide = await presentation.slides.id(slideId);
     res.status(200).json(slide);
   } catch (error) {
@@ -132,10 +130,8 @@ const deleteSlideById = async (req, res, next) => {
   const { presentationId, slideId } = req.params;
   try {
     const presentation = await Presentation.findOne({ _id: presentationId, createdBy: req.user.userId });
-    //console.log(presentation);
     const slide = await presentation.slides.id(slideId).remove();
     await presentation.save();
-    //console.log(slide, "Slide deleted");
     res.status(200).json(slide);
   } catch (error) {
     next(error);
@@ -143,9 +139,7 @@ const deleteSlideById = async (req, res, next) => {
 };
 const updateSlideById = async (req, res, next) => {
   const { presentationId, slideId } = req.params;
-  //console.log(req.body);
   const updates = Object.keys(req.body);
-  //console.log(updates);
   const allowableUpdates = ["slideTitle", "slideBody", "slideImage", "slideQuestion", "_id"];
   const isValidOperation = updates.every(update => {
     return allowableUpdates.includes(update);
