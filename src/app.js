@@ -12,7 +12,7 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET
 });
 app.use(cors());
-app.options("*", cors());
+app.options("https://pivot-a.netlify.app", cors());
 require("dotenv").config();
 app.enable("trust proxy");
 
@@ -46,7 +46,7 @@ const http = require("http");
 app.server = http.createServer(app);
 const options = {
   cors: true,
-  origins: ["*"]
+  origins: ["https://pivot-a.netlify.app"]
   //https://localhost:3000
 };
 io = require("socket.io")(app.server, options);
