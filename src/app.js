@@ -38,7 +38,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/presentations", authenticateUser, presentationsRouter);
 app.use("/api/v1/schedule", scheduleRouter);
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use("*", invalideUrlMiddleware);
 app.use(errorHandlerMiddleware);
 

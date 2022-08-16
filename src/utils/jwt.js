@@ -28,10 +28,10 @@ const attachCookiesToResponse = ({ req, res, user }) => {
   const oneDay = 1000 * 60 * 60 * 24;
   //const oneDay = 20000;
   res.cookie("token", token, {
-    // httpOnly: true,
+    httpOnly: true,
     expires: new Date(Date.now() + oneDay),
 
-    //  secure: req.secure || req.headers["x-forwarded-proto"] === "https",
+    secure: req.secure || req.headers["x-forwarded-proto"] === "https",
     signed: "true"
   });
 };
