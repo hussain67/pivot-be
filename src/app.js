@@ -11,7 +11,7 @@ cloudinary.config({
   api_key: process.env.CLOUD_API_KEY,
   api_secret: process.env.CLOUD_API_SECRET
 });
-app.use(cors({ origin: "https://pivot-fe-demo.herokuapp.com/" }));
+app.use(cors());
 //app.options("https://pivot-a.netlify.app", cors());
 require("dotenv").config();
 app.enable("trust proxy", 1);
