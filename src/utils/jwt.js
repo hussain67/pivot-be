@@ -30,9 +30,9 @@ const attachCookiesToResponse = ({ req, res, user }) => {
   res.cookie("token", token, {
     httpOnly: true,
     expires: new Date(Date.now() + oneDay),
-    secure: true,
+    // secure: true,
     sameSite: "none",
-    //secure: req.secure || req.headers["x-forwarded-proto"] === "https",
+    secure: req.secure || req.headers["x-forwarded-proto"] === "https",
     signed: "true"
   });
 };
