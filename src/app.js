@@ -48,7 +48,7 @@ const http = require("http");
 app.server = http.createServer(app);
 const options = {
   cors: true,
-  origins: ["https://pivot-a.netlify.app"]
+  origins: ["https://pivot-fe-demo.herokuapp.com"]
   //https://localhost:3000
 };
 io = require("socket.io")(app.server, options);
