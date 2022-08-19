@@ -11,8 +11,15 @@ cloudinary.config({
   api_key: process.env.CLOUD_API_KEY,
   api_secret: process.env.CLOUD_API_SECRET
 });
-app.use(cors("https://pivot-fe-demo.herokuapp.com"));
-//app.options("https://pivot-a.netlify.app", cors());
+let url;
+if (process.env.NODE_ENV === "production") {
+  url = "https://pivot-a.netlify.app";
+} else {
+  url = "http://localhost:3000";
+}
+
+app.use(cors(url));
+
 require("dotenv").config();
 //app.enable("trust proxy", 1);
 
@@ -48,9 +55,9 @@ const http = require("http");
 app.server = http.createServer(app);
 const options = {
   cors: true,
-  origins: ["https://pivot-fe-demo.herokuapp.com"]
-  //https://localhost:3000
+  origins: ["https://localhost:3000", "https://pivot-a.netlify.app"]
 };
+
 io = require("socket.io")(app.server, options);
 
 io.on("connection", socket => {

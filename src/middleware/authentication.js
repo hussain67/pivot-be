@@ -1,21 +1,23 @@
-const { isTokenValid } = require("../utils");
-//const CustomError = require("../errors");
+const jwt = require("jsonwebtoken");
+const { UnauthenticatedError } = require("../errors");
 
 const authenticateUser = async (req, res, next) => {
-  const token = req.signedCookies.token;
-  //console.log(token);
-  if (!token) {
-    //throw new CustomError.UnauthenticatedError("Authentication invalid");
-    res.status(401).json("No token present");
-    return;
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    throw new UnauthenticatedError("No token provided");
   }
+
+  const token = authHeader.split(" ")[1];
+
   try {
-    const payload = isTokenValid({ token });
-    const { name, userId, role } = payload;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { name, userId, role } = decoded;
     req.user = { name, userId, role };
+    console.log(req.user);
     next();
   } catch (error) {
-    next(error);
+    throw new UnauthenticatedError("Not authorized to access this route");
   }
 };
 

@@ -1,5 +1,5 @@
 const User = require("../models/userModel");
-
+const jwt = require("jsonwebtoken");
 const { StatusCodes } = require("http-status-codes");
 const { UnauthenticatedError, BadRequestError } = require("../errors");
 const { attachCookiesToResponse, createTokenUser } = require("../utils");
@@ -16,9 +16,12 @@ const register = async (req, res, next) => {
     if (!user) {
       throw new BadRequestError("Invalid credentials");
     }
-    const tokenUser = createTokenUser(user);
-    attachCookiesToResponse({ req, res, user: tokenUser });
-    res.status(StatusCodes.CREATED).json({ user: { name: user.name } });
+
+    const token = jwt.sign({ userId: user._id, role }, process.env.JWT_SECRET, { expiresIn: "30d" });
+
+    //console.log(token);
+
+    res.status(StatusCodes.CREATED).json({ user: { name: user.name }, token });
   } catch (error) {
     next(error);
   }
@@ -39,9 +42,12 @@ const login = async (req, res, next) => {
     if (!isPasswordCorrect) {
       throw new UnauthenticatedError("Invalid credentials");
     }
-    const tokenUser = createTokenUser(user);
-    attachCookiesToResponse({ req, res, user: tokenUser });
-    res.status(StatusCodes.OK).json({ user: { name: user.name } });
+    //console.log(user);
+    const { name, _id, role } = user;
+    const token = jwt.sign({ name, userId: _id, role }, process.env.JWT_SECRET, { expiresIn: "30d" });
+
+    //console.log(token);
+    res.status(StatusCodes.OK).json({ user: { name: user.name }, token });
   } catch (error) {
     next(error);
   }
