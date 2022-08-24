@@ -9,14 +9,12 @@ const getPresentationWelcomeMessage = async (req, res) => {
 };
 
 const createPresentation = async (req, res, next) => {
-  console.log(req.user);
-  console.log({ ...req.body });
   try {
     if (!req.body.title) {
-      throw new BadRequestError("Provide necessary field!!!!");
+      throw new BadRequestError("Provide necessary field");
     }
-    const presentation = await new Presentation({ ...req.body, createdBy: req.user.userId, slides: [{ slideTitle: ` ${req.body.title}` }] }).save();
-    console.log(presentation);
+    const presentation = await new Presentation({ ...req.body, createdBy: req.user.userId, slides: [] }).save();
+
     res.status(201).json(presentation);
   } catch (error) {
     next(error);
@@ -29,7 +27,7 @@ const getPresentationById = async (req, res, next) => {
     const presentations = await Presentation.findOne({ _id: id, createdBy: req.user.userId });
 
     if (!presentations) {
-      throw new NotFoundError("requested resources not found");
+      throw new NotFoundError("Requested resources not found");
     }
     res.status(StatusCodes.OK).send(presentations);
   } catch (error) {
@@ -99,7 +97,7 @@ const uploadSlideImage = async (req, res) => {
 };
 
 const createSlide = async (req, res, next) => {
-  const { id } = req.params;
+  //const { id } = req.params;
   //console.log(req.body);
   try {
     if (!req.body.slideTitle || !req.body.slideBody) {
@@ -110,7 +108,7 @@ const createSlide = async (req, res, next) => {
     const count = presentation.slides.push({ ...req.body });
     const slideId = presentation.slides[count - 1]._id;
     await presentation.save();
-    res.status(201).json(slideId);
+    res.status(201).json({ slideId });
   } catch (error) {
     next(error);
   }
@@ -166,7 +164,7 @@ const updateSlideById = async (req, res, next) => {
 const fetchAllSlides = async (req, res, next) => {
   try {
     const presentation = await Presentation.findOne({ _id: req.params.id, createdBy: req.user.userId });
-    res.status(200).send(presentation.slides);
+    res.status(200).send({ slides: presentation.slides });
   } catch (error) {
     next(error);
   }

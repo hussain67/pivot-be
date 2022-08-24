@@ -24,7 +24,7 @@ require("dotenv").config();
 //app.enable("trust proxy", 1);
 
 const home = require("./routes/home");
-const apiRouter = require("./routes/apiInfo");
+//const apiRouter = require("./routes/apiInfo");
 const authRouter = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
 const presentationsRouter = require("./routes/presentationRoutes");

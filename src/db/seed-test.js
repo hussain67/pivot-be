@@ -1,67 +1,69 @@
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const Presenter = require("../models/presentersModel");
-const Presentation = require("../models/presentationsModel");
+const User = require("../models/userModel");
+const Presentation = require("../models/presentationModel");
 
-const presenterOneId = new mongoose.Types.ObjectId();
-const presenterOne = {
-  _id: presenterOneId,
+const userOneId = new mongoose.Types.ObjectId();
+const userOne = {
+  _id: userOneId,
   name: "msh1",
   email: "msh1@example.com",
   password: "msh123451",
-  tokens: [{ token: jwt.sign({ _id: presenterOneId }, process.env.JWT_SECRET) }]
+  tokens: [{ token: jwt.sign({ _id: userOneId }, process.env.JWT_SECRET) }]
 };
-const presenterTwoId = new mongoose.Types.ObjectId();
-const presenterTwo = {
-  _id: presenterTwoId,
+const userTwoId = new mongoose.Types.ObjectId();
+const userTwo = {
+  _id: userTwoId,
   name: "msh2",
   email: "msh2@example.com",
   password: "msh223451",
-  tokens: [{ token: jwt.sign({ _id: presenterTwoId }, process.env.JWT_SECRET) }]
+  tokens: [{ token: jwt.sign({ _id: userTwoId }, process.env.JWT_SECRET) }]
 };
-const presenterThreeId = new mongoose.Types.ObjectId();
-const presenterThree = {
-  _id: presenterThreeId,
+const userThreeId = new mongoose.Types.ObjectId();
+const userThree = {
+  _id: userThreeId,
   name: "msh3",
   email: "msh3@example.com",
   password: "msh3234513",
-  tokens: [{ token: jwt.sign({ _id: presenterThreeId }, process.env.JWT_SECRET) }]
+  tokens: [{ token: jwt.sign({ _id: userThreeId }, process.env.JWT_SECRET) }]
 };
 const presentationOne = {
   _id: new mongoose.Types.ObjectId(),
   title: "Chemical reaction 1",
-  slides: [{ slideTitle: "Slide One" }],
-  createdBy: presenterOne._id
+  createdBy: userOne._id,
+  slides: [{ slideTitle: "Slide One" }]
 };
 const presentationTwo = {
   _id: new mongoose.Types.ObjectId(),
   title: "Chemical reaction 2",
-  createdBy: presenterTwo._id
+  createdBy: userTwo._id,
+  slides: [{ slideTitle: "Slide Two" }]
 };
 const presentationThree = {
   _id: new mongoose.Types.ObjectId(),
   title: "Chemical reaction 3",
-  createdBy: presenterTwo._id
+  createdBy: userTwo._id,
+  slides: [{ slideTitle: "Slide Three" }]
 };
 const setupDatabase = async () => {
-  await Presenter.deleteMany();
+  await User.deleteMany();
   await Presentation.deleteMany();
-  await new Presenter(presenterOne).save();
-  await new Presenter(presenterTwo).save();
-  await new Presenter(presenterThree).save();
+  await new User(userOne).save();
+  await new User(userTwo).save();
+  await new User(userThree).save();
   await new Presentation(presentationOne).save();
   await new Presentation(presentationTwo).save();
   await new Presentation(presentationThree).save();
 };
 
 module.exports = {
-  presenterOneId,
-  presenterOne,
-  presenterTwo,
-  presenterTwoId,
+  userOneId,
+  userOne,
+  userTwo,
+  userTwoId,
   presentationOne,
   presentationTwo,
-  presenterThree,
-  presenterThreeId,
+  userThree,
+  userThreeId,
   setupDatabase
 };
