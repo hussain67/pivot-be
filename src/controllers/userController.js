@@ -26,13 +26,55 @@ const getSingleUser = async (req, res, next) => {
     next(error);
   }
 };
-const showCurrentUser = async (req, res, next) => {
+
+//Return an existing user
+const showUser = async (req, res, next) => {
+  //console.log(req.user);
   try {
     res.status(StatusCodes.OK).json({ user: req.user });
   } catch (error) {
     next(error);
   }
 };
+// Delete an user
+const deleteUser = async (req, res, next) => {
+  const { userId } = req.user;
+
+  try {
+    const user = await User.findOneAndDelete({ _id: userId });
+    if (!user) {
+      throw new NotFoundError(`No user found with id ${userId}`);
+    }
+    res.status(StatusCodes.OK).json({ user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateUser = async (req, res, next) => {
+  const { userId } = req.user;
+  const updates = Object.keys(req.body);
+  const allowedUpdates = ["name", "email", "password"];
+  const isValidOperation = updates.every(update => allowedUpdates.includes(update));
+
+  if (!isValidOperation) {
+    return res.status(400).send({ error: "Invalid updates!" });
+  }
+  const user = await User.findOne({ _id: userId });
+  if (!user) {
+    throw new NotFoundError(`No user found with id ${userId}`);
+  }
+
+  try {
+    updates.forEach(update => (user[update] = req.body[update]));
+    user.save();
+    res.status(StatusCodes.OK).json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/*
 const updateUser = async (req, res, next) => {
   const { name, email } = req.body;
   if (!name || !email) {
@@ -70,11 +112,13 @@ const updateUserPassword = async (req, res, next) => {
     next(error);
   }
 };
+*/
 
 module.exports = {
   getAllUsers,
   getSingleUser,
-  showCurrentUser,
-  updateUser,
-  updateUserPassword
+  showUser,
+  deleteUser,
+  updateUser
+  //updateUserPassword
 };

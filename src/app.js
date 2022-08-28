@@ -21,10 +21,8 @@ if (process.env.NODE_ENV === "production") {
 app.use(cors(url));
 
 require("dotenv").config();
-//app.enable("trust proxy", 1);
 
-const home = require("./routes/home");
-//const apiRouter = require("./routes/apiInfo");
+const apiInfoRouter = require("./routes/apiInfoRoutes");
 const authRouter = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
 const presentationsRouter = require("./routes/presentationRoutes");
@@ -33,16 +31,12 @@ const { authenticateUser } = require("./middleware/authentication");
 
 const invalideUrlMiddleware = require("./middleware/invalid-url");
 const errorHandlerMiddleware = require("./middleware/error-handler");
-const { addUser, getUser, removeUser, getPresenter, getUsersInRoom } = require("./utils/users");
+const { addUser, getUser, removeUser, getPresenter } = require("./utils/users");
 app.use(morgan("tiny"));
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
 app.use(fileUpload({ useTempFiles: true }));
-app.get("/", (req, res) => {
-  res.send("Pivot api");
-});
-app.use("/api/v1", home);
-app.use("/public", express.static("public"));
+app.use("/api/v1", apiInfoRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/presentations", authenticateUser, presentationsRouter);

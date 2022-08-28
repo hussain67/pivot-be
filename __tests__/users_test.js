@@ -1,15 +1,37 @@
 const request = require("supertest");
 require("dotenv").config();
+const mongoose = require("mongoose");
 const app = require("../src/app");
 
 const connectDB = require("../src/db/connect");
 const User = require("../src/models/userModel");
-const { userOneId, userOne, setupDatabase } = require("../src/db/seed-test");
+
 const url = process.env.MONGO_URI_TEST;
 connectDB(url);
 jest.setTimeout(10000);
 
+const userOneId = new mongoose.Types.ObjectId();
+const userOne = {
+  _id: userOneId,
+  name: "msh1",
+  email: "msh1@example.com",
+  password: "msh123451"
+};
+const setupDatabase = async () => {
+  await User.deleteMany();
+  await new User(userOne).save();
+};
+
 beforeEach(setupDatabase);
+
+// Login userOne and get the jwt
+const jwtOne = async () => {
+  const loginInfo = await request(app).post("/api/v1/auth/login").send({
+    email: userOne.email,
+    password: userOne.password
+  });
+  return loginInfo.body.token;
+};
 
 describe("Create new user", () => {
   test("return status 201 and register a new user", async () => {
@@ -75,45 +97,36 @@ describe("logout user", () => {
   });
 });
 
-describe.skip("Authentication user", () => {
-  test("Should get existing user", async () => {
-    await request(app).get("/api/v1/users/me").set("Authorization", `Bearer ${userOne.tokens[0].token}`).send({}).expect(200);
-  });
-
-  test("Should not return non existing user", async () => {
-    await request(app).get("/api/v1/users/me").set("Authorization", `Bearer 12352vbshxsh`).send().expect(401);
+describe("Get existing user", () => {
+  test("Should get an existing user", async () => {
+    const token = await jwtOne();
+    await request(app).get("/api/v1/users/user").set("Authorization", `Bearer ${token}`).send({}).expect(200);
   });
 });
-describe.skip("Delete a user", () => {
+describe("Delete a user", () => {
   test("Delete an authenticated user", async () => {
-    await request(app).delete("/api/v1/users/me").set("Authorization", `Bearer ${userOne.tokens[0].token}`).send({}).expect(200);
+    const token = await jwtOne();
+
+    await request(app).delete("/api/v1/users/user").set("Authorization", `Bearer ${token}`).send().expect(200);
     const user = await User.findById(userOneId);
     expect(user).toBeNull();
   });
-
-  test(" Should not delete an authenticated user", async () => {
-    await request(app).delete("/api/v1/users/me").send({}).expect(401);
-    const user = await User.findById(userOneId);
-    expect(user).toMatchObject({
-      _id: userOneId,
-      name: "msh1",
-      email: "msh1@example.com"
-    });
-  });
+  /*
+  test.only(" Should not delete an authenticated user", async () => {
+    await request(app).delete("/api/v1/users/user").send().expect(401);
+  });*/
 });
 
-describe.skip("Update an user", () => {
+describe("Update an user", () => {
   test("Update an authenticated user field", async () => {
-    const response = await request(app).patch("/api/v1/users/me").set("Authorization", `Bearer ${userOne.tokens[0].token}`).send({ name: "msh123" }).expect(200);
+    const token = await jwtOne();
+
+    const response = await request(app).patch("/api/v1/users/user").set("Authorization", `Bearer ${token}`).send({ name: "msh123" }).expect(200);
+    console.log(response.body);
     expect(response.body.name).toBe("msh123");
   });
   test("Should not update an invalid user field", async () => {
-    const response = await request(app).patch("/api/v1/users/me").set("Authorization", `Bearer ${userOne.tokens[0].token}`).send({ profession: "teacher" }).expect(400);
-  });
-});
-describe.skip("Error handling for invalid url", () => {
-  test("status:404 and return an error message", async () => {
-    const response = await request(app).get("/invalid_url").expect(404);
-    expect(response.body.msg).toBe("Can't find /invalid_url on this server!");
+    const token = await jwtOne();
+    const response = await request(app).patch("/api/v1/users/user").set("Authorization", `Bearer ${token}`).send({ profession: "teacher" }).expect(400);
   });
 });

@@ -8,43 +8,41 @@ const userOne = {
   _id: userOneId,
   name: "msh1",
   email: "msh1@example.com",
-  password: "msh123451",
-  tokens: [{ token: jwt.sign({ _id: userOneId }, process.env.JWT_SECRET) }]
+  password: "msh123451"
 };
 const userTwoId = new mongoose.Types.ObjectId();
 const userTwo = {
   _id: userTwoId,
   name: "msh2",
   email: "msh2@example.com",
-  password: "msh223451",
-  tokens: [{ token: jwt.sign({ _id: userTwoId }, process.env.JWT_SECRET) }]
+  password: "msh223451"
 };
 const userThreeId = new mongoose.Types.ObjectId();
 const userThree = {
   _id: userThreeId,
   name: "msh3",
   email: "msh3@example.com",
-  password: "msh3234513",
-  tokens: [{ token: jwt.sign({ _id: userThreeId }, process.env.JWT_SECRET) }]
+  password: "msh3234513"
 };
 const presentationOne = {
   _id: new mongoose.Types.ObjectId(),
   title: "Chemical reaction 1",
   createdBy: userOne._id,
-  slides: [{ slideTitle: "Slide One" }]
+  slides: [{ slideTitle: "Slide One", slideBody: "Slide one body " }]
 };
 const presentationTwo = {
   _id: new mongoose.Types.ObjectId(),
   title: "Chemical reaction 2",
-  createdBy: userTwo._id,
-  slides: [{ slideTitle: "Slide Two" }]
+  createdBy: userOne._id,
+  slides: [{ slideTitle: "Slide Two", slideBody: "Slide two body " }]
 };
 const presentationThree = {
   _id: new mongoose.Types.ObjectId(),
   title: "Chemical reaction 3",
   createdBy: userTwo._id,
-  slides: [{ slideTitle: "Slide Three" }]
+  slides: [{ slideTitle: "Slide three", slideBody: "Slide three body" }]
 };
+
 const setupDatabase = async () => {
   await User.deleteMany();
   await Presentation.deleteMany();
@@ -63,6 +61,7 @@ module.exports = {
   userTwoId,
   presentationOne,
   presentationTwo,
+  presentationThree,
   userThree,
   userThreeId,
   setupDatabase
